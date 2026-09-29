@@ -1,0 +1,1328 @@
+{
+  "app": "MJUE YESU",
+  "version": "Lyrics Pack 1-220",
+  "language": "sw-TZ",
+  "description": "Kifurushi cha lyrics kinachoweza kuingizwa kwenye app. Sehemu ya lyrics imeachwa tupu ili kuingiza maneno ambayo una haki ya kutumia.",
+  "songs": {
+    "1": {
+      "title": "Mtakatifu, Mtakatifu, Mtakatifu",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "2": {
+      "title": "Twamsifu Mungu",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "3": {
+      "title": "Mungu Atukuzwe",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "4": {
+      "title": "Jina La Yesu, Salamu",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "5": {
+      "title": "Na Tumwabudu Mfalme Mtukufu",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "6": {
+      "title": "Kumekucha Kwa Uzuri",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "7": {
+      "title": "Mungu Msaada Wetu",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "8": {
+      "title": "Uje Mkombozi",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "9": {
+      "title": "Mwumbaji, Mfalme",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "10": {
+      "title": "Kristo Wa Neema Yote",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "11": {
+      "title": "Jina La Bwana Li Heri",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "12": {
+      "title": "Msifu Mungu",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "13": {
+      "title": "Yesu Uje Kwetu",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "14": {
+      "title": "Nitembee Nawe",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "15": {
+      "title": "Nena Mungu",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "16": {
+      "title": "Ninakuhitaji",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "17": {
+      "title": "Si Mimi, Kristo",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "18": {
+      "title": "Mwokozi Kama Mchungwa",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "19": {
+      "title": "Msalabani Pa Mwokozi",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "20": {
+      "title": "Mungu Wetu Yeye Mwamba",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "21": {
+      "title": "Baba Twakujia",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "22": {
+      "title": "Usinipite Mwokozi",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "23": {
+      "title": "Yesu Furaha Ya Moyo",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "24": {
+      "title": "Jina Lake Yesu Tamu",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "25": {
+      "title": "Taji Mvikeni",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "26": {
+      "title": "Tutokapo Tubariki",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "27": {
+      "title": "Tena, Mwokozi, Twalitukuza Jina Lako",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "28": {
+      "title": "Jina La Thamani",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "29": {
+      "title": "Yesu Nakupenda",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "30": {
+      "title": "Yesu, Unipendaye",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "31": {
+      "title": "Niimbe Pendo Lake",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "32": {
+      "title": "Tangu Kuamini",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "33": {
+      "title": "Karibu Sana",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "34": {
+      "title": "Hadithia Kisa Cha Yesu",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "35": {
+      "title": "Nimekombolewa Na Yesu",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "36": {
+      "title": "Siku Kuu",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "37": {
+      "title": "Pendo Lako, Ee Mwokozi",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "38": {
+      "title": "Nasifu Shani Ya Mungu",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "39": {
+      "title": "Ati, Kuna Mvua Njema",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "40": {
+      "title": "Nijaze Sasa",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "41": {
+      "title": "Roho Mtakatifu",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "42": {
+      "title": "Ewe Roho Wa Mbinguni",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "43": {
+      "title": "Furaha Gani!",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "44": {
+      "title": "Urafiki Wa Yesu",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "45": {
+      "title": "Mwanga Umo Moyoni",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "46": {
+      "title": "Miguuni Pake Yesu",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "47": {
+      "title": "Ni Heri Kifungo",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "48": {
+      "title": "Ninakupenda Zaidi",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "49": {
+      "title": "Ninaye Rafiki",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "50": {
+      "title": "Mungu Nawe Nanyi Daima",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "51": {
+      "title": "Kuwa na Yesu Mwokozi",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "52": {
+      "title": "Nipe Biblia",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "53": {
+      "title": "Napenda Kuhubiri",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "54": {
+      "title": "Nataka Nimjue Yesu",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "55": {
+      "title": "Twapanda Mapema",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "56": {
+      "title": "Waponyeni Watu",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "57": {
+      "title": "Usikatae Kazi",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "58": {
+      "title": "Zitakuwa Nyota Tajini?",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "59": {
+      "title": "Fanyeni Kazi Zenu",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "60": {
+      "title": "Nitakwenda Utakaponitumia",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "61": {
+      "title": "Bwana Nami",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "62": {
+      "title": "Napenda Kitabu Chake",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "63": {
+      "title": "Niuonapo Msalaba",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "64": {
+      "title": "Piga Panda Ya Injili",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "65": {
+      "title": "Twendeni Askari",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "66": {
+      "title": "Roho Yangu Amka Sasa",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "67": {
+      "title": "Kesho Roho Yangu",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "68": {
+      "title": "Tusimame Imara Mwambani",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "69": {
+      "title": "Chakutumaini Sina",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "70": {
+      "title": "Wapenzi Wa Bwana",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "71": {
+      "title": "Kesheni Kaombeni",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "72": {
+      "title": "Jenga Juu Ya Mwamba",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "73": {
+      "title": "Bwana Uniongoze Juu",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "74": {
+      "title": "Niambie Ee Mlinzi",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "75": {
+      "title": "Msingi Imara, Ninyi Wa Bwana",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "76": {
+      "title": "Mrithi Ufalme",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "77": {
+      "title": "Habari Za Usiku",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "78": {
+      "title": "Mpaka Lini Bwana?",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "79": {
+      "title": "Nataka Imani Hii",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "80": {
+      "title": "Tupe Moto Wa Uhai",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "81": {
+      "title": "Siku Sita Zimepita",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "82": {
+      "title": "Ni siku Ya Furaha",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "83": {
+      "title": "Ewe Skuli Ya Sabato",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "84": {
+      "title": "Ikumbuke Sabato",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "85": {
+      "title": "Salama Tumepita",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "86": {
+      "title": "Ukaribie Tena",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "87": {
+      "title": "Siku Ya Sabato",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "88": {
+      "title": "Siku Hii Ya Sabato",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "89": {
+      "title": "Asubuhi",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "90": {
+      "title": "Mapya Ni Mapenzi hayo",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "91": {
+      "title": "Kaa Nami",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "92": {
+      "title": "Magharibi Jua",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "93": {
+      "title": "Jua La Rohoni Mwangu",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "94": {
+      "title": "Po Pote Mashamba Yajaa",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "95": {
+      "title": "Zileteni Zaka Kwa Hazina",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "96": {
+      "title": "Mali Yako Sasa",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "97": {
+      "title": "Sioshwi Dhambi Zangu?",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "98": {
+      "title": "Nilikupa Wewe",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "99": {
+      "title": "Twende Kwa Yesu",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "100": {
+      "title": "Kuwatafuta Wasioweza",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "101": {
+      "title": "Yesu Akwita",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "102": {
+      "title": "Mlangoni Pa Moyo",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "103": {
+      "title": "Yesu Huita kwa Upole",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "104": {
+      "title": "Yesu Aliniita, “Njoo”",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "105": {
+      "title": "Mchungaji mpenzi",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "106": {
+      "title": "Huna Kitu Kwa Yesu?",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "107": {
+      "title": "Nipo Bwana, Nitumne",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "108": {
+      "title": "Tumesikia Mbitu",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "109": {
+      "title": "Anisikiaye",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "110": {
+      "title": "Mlango Wazi",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "111": {
+      "title": "Tabibu Mkuu",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "112": {
+      "title": "Wewe umechoka sana?",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "113": {
+      "title": "Damu Imebubujika",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "114": {
+      "title": "Yesu Mwokozi",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "115": {
+      "title": "Naendea Msalaba",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "116": {
+      "title": "Moyo Safi",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "117": {
+      "title": "Wamwendea Yesu",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "118": {
+      "title": "Nilipotoka Kabisa",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "119": {
+      "title": "Alilipa Bei",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "120": {
+      "title": "Msalaba wa Yesu",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "121": {
+      "title": "Katika Wenye Dhambi",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "122": {
+      "title": "Yote Namtolea Yesu",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "123": {
+      "title": "Yesu Kwa Imani",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "124": {
+      "title": "Umechokaje Umesumbuka",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "125": {
+      "title": "Uniangalie",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "126": {
+      "title": "Nina Haja Nawe",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "127": {
+      "title": "Ni Salama Rohoni Mwangu",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "128": {
+      "title": "Taamini Nitii Pia",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "129": {
+      "title": "Kumtegemea Mwokozi",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "130": {
+      "title": "Yesu Kwetu Ni Rafiki",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "131": {
+      "title": "Baba Anilinda",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "132": {
+      "title": "Bwana Ni Mchungwa",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "133": {
+      "title": "Po pote na Yesu",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "134": {
+      "title": "Tafuta Daima Utakatifu",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "135": {
+      "title": "Saa Heri ya Maombi",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "136": {
+      "title": "Niwe Kama Yesu",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "137": {
+      "title": "Saa Heri Ya Sala",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "138": {
+      "title": "Nitakuandama Kote",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "139": {
+      "title": "Uliniimbie Tena",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "140": {
+      "title": "Nitwae Hivi Nilivyo",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "141": {
+      "title": "Chini ya Msalaba",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "142": {
+      "title": "Nasikia Mwito",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "143": {
+      "title": "Baba Sina Msaada",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "144": {
+      "title": "Ni Wako Bwana",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "145": {
+      "title": "Ulimwengu Siutaki",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "146": {
+      "title": "Twae Wangu Uzima",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "147": {
+      "title": "Tawala Ndani Yangu",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "148": {
+      "title": "Univute Karibu",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "149": {
+      "title": "Kuwa Wake Yesu",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "150": {
+      "title": "Hasha Maneno Mabaya",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "151": {
+      "title": "Huniongoza Mwokozi",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "152": {
+      "title": "Karibu na Wewe",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "153": {
+      "title": "Fikira Moja Tu",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "154": {
+      "title": "Yanipasa Kuwa Naye",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "155": {
+      "title": "Njiani Huiongoza",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "156": {
+      "title": "Uniongoze, Yehova",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "157": {
+      "title": "Mfalme yu Mlangoni",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "158": {
+      "title": "U mwendo Gani Nyumbani?",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "159": {
+      "title": "Anakuja Upesi",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "160": {
+      "title": "Watakatifu Kesheni",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "161": {
+      "title": "Piga Panda",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "162": {
+      "title": "Tumaini Liko",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "163": {
+      "title": "Pengine Ni Saa",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "164": {
+      "title": "Unakaribia Wakati",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "165": {
+      "title": "Ahadi Tamu",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "166": {
+      "title": "Furaha kwa Ulimwengu",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "167": {
+      "title": "Yesu Bwana Mwokozi",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "168": {
+      "title": "Tarumbeta ya Mwana",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "169": {
+      "title": "Hapo Yesu Atakapoita",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "170": {
+      "title": "Siitafuti Mali",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "171": {
+      "title": "Imeanzishwa Hukumu",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "172": {
+      "title": "Mfalme Wetu Atuita",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "173": {
+      "title": "Hatujui Saa",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "174": {
+      "title": "Sijui Atakapokuja",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "175": {
+      "title": "Nitaonana na Yesu",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "176": {
+      "title": "Ati twonane Mtoni?",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "177": {
+      "title": "Kazi Yangu Ikiisha",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "178": {
+      "title": "Ukingoni Mwa Yordani",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "179": {
+      "title": "Watafurahi",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "180": {
+      "title": "Pana Mahali Pazuri Mno",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "181": {
+      "title": "Tutakaa Mahali Pa Maji",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "182": {
+      "title": "Hapana Giza",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "183": {
+      "title": "Yesu Anaporudi",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "184": {
+      "title": "Panapo Pendo",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "185": {
+      "title": "Mungu, Mapenzi Makamilifu",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "186": {
+      "title": "Hatutaagana Tena",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "187": {
+      "title": "Kufariki Naye Yesu",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "188": {
+      "title": "Wimbi Litakasalo",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "189": {
+      "title": "Mimina Upya",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "190": {
+      "title": "Raha Yangu Yote, Bwana",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "191": {
+      "title": "Mkate wa Mbingu",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "192": {
+      "title": "Mwamba Wenye Imara",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "193": {
+      "title": "Sauti ya Mchungaji",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "194": {
+      "title": "Twaomba Bwana",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "195": {
+      "title": "Msingi wa Kanisa",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "196": {
+      "title": "Kitambo Bwana Yuaja",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "197": {
+      "title": "Anipenda Ni Kweli",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "198": {
+      "title": "Kaza Sana Macho",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "199": {
+      "title": "Upendo Ni Furaha",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "200": {
+      "title": "Baba Yetu Aliye Mbinguni",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "201": {
+      "title": "Hunipenda Pia",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "202": {
+      "title": "Sikia Mlio",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "203": {
+      "title": "Siku Sita Fanya Kazi",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "204": {
+      "title": "Kuwa Na Yesu Nyumbani",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "205": {
+      "title": "Msifu Mungu Ee Watoto",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "206": {
+      "title": "Mwokozi Wangu Anipenda",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "207": {
+      "title": "Nani Afanya Maua",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "208": {
+      "title": "Mungu Afanya Upindi",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "209": {
+      "title": "Napenda Sana Kufika",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "210": {
+      "title": "Roho Wa Mungu Wangu",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "211": {
+      "title": "Moyoni",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "212": {
+      "title": "Mtazame Mwokozi",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "213": {
+      "title": "Niwe nao Uzuri Wa Mwokozi",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "214": {
+      "title": "Nataka Niwe Tayari",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "215": {
+      "title": "Ulimwengu Wataka",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "216": {
+      "title": "Moyoni Nijaze",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "217": {
+      "title": "Omba Sana Asubuhi",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "218": {
+      "title": "Yesu Mwokozi Mpendwa",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "219": {
+      "title": "Pambazuka Nuru",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    },
+    "220": {
+      "title": "Kwa Heri",
+      "lyrics": [],
+      "chorus": [],
+      "source": ""
+    }
+  }
+}
