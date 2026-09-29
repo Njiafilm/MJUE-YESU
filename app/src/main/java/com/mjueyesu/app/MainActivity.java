@@ -1,14 +1,6 @@
 package com.mjueyesu.app;
 
 import android.annotation.SuppressLint;
-import android.app.AlertDialog;
-import android.util.Base64;
-import android.webkit.JavascriptInterface;
-import android.webkit.JsResult;
-import android.widget.Toast;
-import androidx.core.content.FileProvider;
-import java.io.File;
-import java.io.FileOutputStream;
 import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
@@ -35,6 +27,9 @@ import androidx.core.view.WindowInsetsControllerCompat;
 public class MainActivity extends AppCompatActivity {
 
     private WebView webView;
+    private boolean triedFallback = false;
+    private static final String REMOTE_URL = "https://njiafilm.github.io/MJUE-YESU/index.html";
+    private static final String LOCAL_URL = "file:///android_asset/www/index.html";
     private ValueCallback<Uri[]> filePathCallback;
     private ActivityResultLauncher<Intent> fileChooserLauncher;
 
@@ -83,10 +78,6 @@ public class MainActivity extends AppCompatActivity {
         s.setDatabaseEnabled(true);
         s.setAllowFileAccess(true);
         s.setAllowContentAccess(true);
-        // Ruhusu ukurasa wa file:// kufanya fetch/XHR kwenda seva za mbali (https),
-        // vinginevyo Android inazuia kimya kimya (bila kosa) tangu API 30+.
-        s.setAllowUniversalAccessFromFileURLs(true);
-        s.setAllowFileAccessFromFileURLs(true);
         s.setMediaPlaybackRequiresUserGesture(false);
         s.setLoadWithOverviewMode(true);
         s.setUseWideViewPort(true);
@@ -102,51 +93,7 @@ public class MainActivity extends AppCompatActivity {
         } catch (Exception ignored) {}
 
         webView.setBackgroundColor(Color.parseColor("#f3eef8"));
-        webView.addJavascriptInterface(new Object() {
-            @JavascriptInterface
-            public void openPdf(String base64, String name) {
-                try {
-                    String safe = (name == null ? "hati.pdf" : name).replaceAll("[^A-Za-z0-9._-]", "_");
-                    if (!safe.toLowerCase().endsWith(".pdf")) safe += ".pdf";
-                    File dir = new File(getCacheDir(), "pdf");
-                    if (!dir.exists()) dir.mkdirs();
-                    File f = new File(dir, safe);
-                    try (FileOutputStream out = new FileOutputStream(f)) {
-                        out.write(Base64.decode(base64, Base64.DEFAULT));
-                    }
-                    Uri uri = FileProvider.getUriForFile(MainActivity.this,
-                            getPackageName() + ".fileprovider", f);
-                    Intent i = new Intent(Intent.ACTION_VIEW);
-                    i.setDataAndType(uri, "application/pdf");
-                    i.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_ACTIVITY_NEW_TASK);
-                    try {
-                        startActivity(i);
-                    } catch (Exception noViewer) {
-                        runOnUiThread(() -> Toast.makeText(MainActivity.this,
-                                "Hakuna programu ya kusoma PDF. Sakinisha PDF viewer.", Toast.LENGTH_LONG).show());
-                    }
-                } catch (Exception e) {
-                    runOnUiThread(() -> Toast.makeText(MainActivity.this,
-                            "Imeshindwa kufungua PDF", Toast.LENGTH_LONG).show());
-                }
-            }
-        }, "AndroidBridge");
         webView.setWebChromeClient(new WebChromeClient() {
-            @Override
-            public boolean onJsAlert(WebView view, String url, String message, JsResult result) {
-                new AlertDialog.Builder(MainActivity.this).setMessage(message)
-                        .setPositiveButton("Sawa", (d, w) -> result.confirm())
-                        .setOnCancelListener(d -> result.cancel()).show();
-                return true;
-            }
-            @Override
-            public boolean onJsConfirm(WebView view, String url, String message, JsResult result) {
-                new AlertDialog.Builder(MainActivity.this).setMessage(message)
-                        .setPositiveButton("Ndiyo", (d, w) -> result.confirm())
-                        .setNegativeButton("Hapana", (d, w) -> result.cancel())
-                        .setOnCancelListener(d -> result.cancel()).show();
-                return true;
-            }
             @Override
             public boolean onShowFileChooser(WebView view, ValueCallback<Uri[]> callback,
                                              FileChooserParams params) {
@@ -178,9 +125,29 @@ public class MainActivity extends AppCompatActivity {
                 // Optional: open http(s) still inside for offline-first app
                 return false;
             }
+
+            @Override
+            public void onReceivedError(WebView view, WebResourceRequest request,
+                                         android.webkit.WebResourceError error) {
+                // Mtandao ukikosekana au ukurasa wa mtandaoni ukishindikana,
+                // rudi kwenye nakala iliyowekwa ndani ya programu (offline fallback)
+                if (request.isForMainFrame() && !triedFallback) {
+                    triedFallback = true;
+                    view.loadUrl(LOCAL_URL);
+                }
+            }
+
+            @Override
+            @android.annotation.SuppressWarnings("deprecation")
+            public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
+                if (!triedFallback) {
+                    triedFallback = true;
+                    view.loadUrl(LOCAL_URL);
+                }
+            }
         });
 
-        webView.loadUrl("file:///android_asset/www/index.html");
+        webView.loadUrl(REMOTE_URL);
     }
 
     @Override
