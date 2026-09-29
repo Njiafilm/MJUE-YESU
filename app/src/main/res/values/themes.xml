@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.MjueYesu" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="colorPrimary">#6B2D9B</item>
+        <item name="colorPrimaryVariant">#4A1D6E</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="android:statusBarColor">#6B2D9B</item>
+        <item name="android:navigationBarColor">#6B2D9B</item>
+        <item name="android:windowBackground">#f3eef8</item>
+    </style>
+</resources>
