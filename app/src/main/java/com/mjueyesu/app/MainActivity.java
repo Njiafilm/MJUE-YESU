@@ -1,13 +1,12 @@
 package com.mjueyesu.app;
 
 import android.annotation.SuppressLint;
-import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.view.WindowManager;
-import android.webkit.ValueCallback;
+import android.webkit.JavascriptInterface;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
@@ -15,57 +14,106 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
+import org.json.JSONObject;
+
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.Iterator;
+
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowCompat;
-import androidx.core.view.WindowInsetsCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
 
 public class MainActivity extends AppCompatActivity {
 
     private WebView webView;
-    private boolean triedFallback = false;
-    private static final String REMOTE_URL = "https://njiafilm.github.io/MJUE-YESU/index.html";
-    private static final String LOCAL_URL = "file:///android_asset/www/index.html";
-    private ValueCallback<Uri[]> filePathCallback;
-    private ActivityResultLauncher<Intent> fileChooserLauncher;
+
+    /**
+     * Daraja la mtandao kwa ajili ya Cloud (Firebase). Hupitia Java ili kuepuka vikwazo vya CORS
+     * kwenye file:// na kuruhusu tu seva za Firebase/Google zilizoorodheshwa.
+     */
+    private class NativeNet {
+        @JavascriptInterface
+        public void request(final int id, final String method, final String url,
+                            final String headersJson, final String body) {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    int status = 0;
+                    String resp = "";
+                    try {
+                        Uri u = Uri.parse(url);
+                        String host = u.getHost();
+                        if (!"https".equals(u.getScheme()) || host == null
+                                || !(host.equals("firestore.googleapis.com")
+                                || host.equals("identitytoolkit.googleapis.com")
+                                || host.equals("securetoken.googleapis.com"))) {
+                            throw new java.io.IOException("blocked host");
+                        }
+                        HttpURLConnection c = (HttpURLConnection) new URL(url).openConnection();
+                        c.setConnectTimeout(20000);
+                        c.setReadTimeout(60000);
+                        c.setRequestMethod("GET".equals(method) ? "GET" : "POST");
+                        JSONObject h = new JSONObject(headersJson == null || headersJson.isEmpty() ? "{}" : headersJson);
+                        Iterator<String> it = h.keys();
+                        while (it.hasNext()) {
+                            String k = it.next();
+                            c.setRequestProperty(k, h.getString(k));
+                        }
+                        if (!"GET".equals(method) && body != null) {
+                            byte[] data = body.getBytes("UTF-8");
+                            c.setDoOutput(true);
+                            c.setFixedLengthStreamingMode(data.length);
+                            OutputStream os = c.getOutputStream();
+                            os.write(data);
+                            os.close();
+                        }
+                        status = c.getResponseCode();
+                        InputStream in = status >= 400 ? c.getErrorStream() : c.getInputStream();
+                        if (in != null) {
+                            ByteArrayOutputStream bo = new ByteArrayOutputStream();
+                            byte[] buf = new byte[16384];
+                            int n;
+                            while ((n = in.read(buf)) > 0) bo.write(buf, 0, n);
+                            in.close();
+                            resp = bo.toString("UTF-8");
+                        }
+                        c.disconnect();
+                    } catch (Exception e) {
+                        status = 0;
+                        resp = "";
+                    }
+                    final String js = "window.__mjueNetCb&&window.__mjueNetCb(" + id + "," + status + ","
+                            + JSONObject.quote(resp).replace("\u2028", "\\u2028").replace("\u2029", "\\u2029") + ")";
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (webView != null) webView.evaluateJavascript(js, null);
+                        }
+                    });
+                }
+            }).start();
+        }
+    }
 
     @SuppressLint("SetJavaScriptEnabled")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Kuchagua picha/PDF (<input type="file">) ndani ya WebView
-        fileChooserLauncher = registerForActivityResult(
-                new ActivityResultContracts.StartActivityForResult(),
-                result -> {
-                    if (filePathCallback == null) return;
-                    Uri[] uris = WebChromeClient.FileChooserParams.parseResult(
-                            result.getResultCode(), result.getData());
-                    filePathCallback.onReceiveValue(uris);
-                    filePathCallback = null;
-                });
-
-                WindowInsetsControllerCompat insets =
+        WindowCompat.setDecorFitsSystemWindows(getWindow(), true);
+        getWindow().setStatusBarColor(Color.parseColor("#6B2D9B"));
+        WindowInsetsControllerCompat insets =
                 WindowCompat.getInsetsController(getWindow(), getWindow().getDecorView());
         if (insets != null) {
             insets.setAppearanceLightStatusBars(false);
         }
 
         FrameLayout root = new FrameLayout(this);
-        root.setBackgroundColor(Color.parseColor("#6B2D9B"));
-        // Android 15+ (targetSdk 35/36) huchora kwa ukingo hadi ukingo: acha nafasi kwa status/navigation bar na kibodi
-        ViewCompat.setOnApplyWindowInsetsListener(root, (v, windowInsets) -> {
-            Insets bars = windowInsets.getInsets(
-                    WindowInsetsCompat.Type.systemBars()
-                            | WindowInsetsCompat.Type.displayCutout()
-                            | WindowInsetsCompat.Type.ime());
-            v.setPadding(bars.left, bars.top, bars.right, bars.bottom);
-            return WindowInsetsCompat.CONSUMED;
-        });
+        root.setBackgroundColor(Color.parseColor("#f3eef8"));
         webView = new WebView(this);
         root.addView(webView, new FrameLayout.LayoutParams(
                 FrameLayout.LayoutParams.MATCH_PARENT,
@@ -89,31 +137,11 @@ public class MainActivity extends AppCompatActivity {
         // Faster rendering
         s.setRenderPriority(WebSettings.RenderPriority.HIGH);
         try {
-            webView.setLayerType(View.LAYER_TYPE_HARDWARE, null);
+            s.setLayerType(View.LAYER_TYPE_HARDWARE, null);
         } catch (Exception ignored) {}
 
         webView.setBackgroundColor(Color.parseColor("#f3eef8"));
-        webView.setWebChromeClient(new WebChromeClient() {
-            @Override
-            public boolean onShowFileChooser(WebView view, ValueCallback<Uri[]> callback,
-                                             FileChooserParams params) {
-                if (filePathCallback != null) {
-                    filePathCallback.onReceiveValue(null);
-                }
-                filePathCallback = callback;
-                try {
-                    Intent intent = params.createIntent();
-                    if (params.getMode() == FileChooserParams.MODE_OPEN_MULTIPLE) {
-                        intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-                    }
-                    fileChooserLauncher.launch(intent);
-                } catch (Exception e) {
-                    filePathCallback = null;
-                    return false;
-                }
-                return true;
-            }
-        });
+        webView.setWebChromeClient(new WebChromeClient());
         webView.setWebViewClient(new WebViewClient() {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
@@ -125,38 +153,32 @@ public class MainActivity extends AppCompatActivity {
                 // Optional: open http(s) still inside for offline-first app
                 return false;
             }
-
-            @Override
-            public void onReceivedError(WebView view, WebResourceRequest request,
-                                         android.webkit.WebResourceError error) {
-                // Mtandao ukikosekana au ukurasa wa mtandaoni ukishindikana,
-                // rudi kwenye nakala iliyowekwa ndani ya programu (offline fallback)
-                if (request.isForMainFrame() && !triedFallback) {
-                    triedFallback = true;
-                    view.loadUrl(LOCAL_URL);
-                }
-            }
-
-            @Override
-            @android.annotation.SuppressWarnings("deprecation")
-            public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
-                if (!triedFallback) {
-                    triedFallback = true;
-                    view.loadUrl(LOCAL_URL);
-                }
-            }
         });
 
-        webView.loadUrl(REMOTE_URL);
+        webView.addJavascriptInterface(new NativeNet(), "MJUE_NATIVE");
+        webView.loadUrl("file:///android_asset/www/index.html");
     }
 
     @Override
     public void onBackPressed() {
-        if (webView != null && webView.canGoBack()) {
-            webView.goBack();
-        } else {
+        if (webView == null) {
             super.onBackPressed();
+            return;
         }
+        // Funga tabaka la juu kwanza (dirisha la fungu / Biblia / lesoni), kisha rudi nyuma
+        webView.evaluateJavascript(
+                "(function(){return !!(window.mjueBack&&window.mjueBack());})()",
+                new android.webkit.ValueCallback<String>() {
+                    @Override
+                    public void onReceiveValue(String value) {
+                        if ("true".equals(value)) return;
+                        if (webView != null && webView.canGoBack()) {
+                            webView.goBack();
+                        } else {
+                            MainActivity.super.onBackPressed();
+                        }
+                    }
+                });
     }
 
     @Override

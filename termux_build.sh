@@ -10,7 +10,7 @@ pkg install -y wget unzip
 pkg install -y openjdk-17 || pkg install -y openjdk-21
 pkg install -y aapt2 || echo "ONYO: aapt2 haikupatikana"
 
-JDK_DIR="$(dirname "$(dirname "$(readlink -f "$(command -v java)")")")"
+JDK_DIR="$(ls -d "$PREFIX"/lib/jvm/*/ 2>/dev/null | head -1)"
 export JAVA_HOME="${JDK_DIR%/}"
 export PATH="$JAVA_HOME/bin:$PATH"
 export ANDROID_HOME="$HOME/android-sdk"

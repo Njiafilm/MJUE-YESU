@@ -36,9 +36,5 @@ bash termux_build.sh
 ```
 APK itakuwa: Downloads/MJUE_YESU.apk
 
-## AAB ya Google Play (release, targetSdk 36)
-```bash
-cd ~/MJUE_YESU_Android
-bash termux_release.sh
-```
-AAB: Downloads/MJUE_YESU.aab. Hifadhi mjueyesu-release.jks + nenosiri mahali salama.
+## Toleo 3.0 — Cloud (admin → watumiaji wote)
+Soma **SETUP_CLOUD.md** (dakika ~10, mara moja). Bila kujaza `www/cloud-config.js`, app inafanya kazi offline kama zamani.
