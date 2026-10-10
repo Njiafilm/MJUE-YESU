@@ -477,14 +477,19 @@ window.mjueCloudLessonBlock = async function(key, m){
   if(!ON || !API.isAdmin() || !m) return;
   try{
     toast('\u2601 Inapakia maudhui ya somo\u2026');
-    var imgs = [];
-    for(var i = 0; i < (m.imageKeys || []).length; i++){
-      var b = await aGet(m.imageKeys[i]); if(!b) continue;
-      imgs.push(b.size > 400000 || /png|webp/.test(b.type) ? await imgToData(b, 1280, 0.78, 'image/jpeg') : await blobToData(b));
+    async function pack(v){
+      var imgs = [];
+      for(var i = 0; i < (v.imageKeys || []).length; i++){
+        var b = await aGet(v.imageKeys[i]); if(!b) continue;
+        imgs.push(b.size > 400000 || /png|webp/.test(b.type) ? await imgToData(b, 1280, 0.78, 'image/jpeg') : await blobToData(b));
+      }
+      var pdf = null;
+      if(v.pdfKey){ var pb = await aGet(v.pdfKey); if(pb){ if(pb.size > 4000000) throw new Error('PDF ni kubwa kuliko 4MB'); pdf = await blobToData(pb); } }
+      return { title: v.title || '', desc: v.desc || '', images: imgs, pdf: pdf, pdfName: v.pdfName || '' };
     }
-    var pdf = null;
-    if(m.pdfKey){ var pb = await aGet(m.pdfKey); if(pb){ if(pb.size > 4000000) throw new Error('PDF ni kubwa kuliko 4MB'); pdf = await blobToData(pb); } }
-    var payload = JSON.stringify({ title: m.title, desc: m.desc, images: imgs, pdf: pdf, pdfName: m.pdfName || '', public: m.public !== false });
+    var sw = await pack(m);
+    var en = m.en ? await pack(m.en) : null;
+    var payload = JSON.stringify({ title: sw.title, desc: sw.desc, images: sw.images, pdf: sw.pdf, pdfName: sw.pdfName, en: en, public: m.public !== false });
     if(payload.length > 9000000) throw new Error('Maudhui ni makubwa mno (zaidi ya 9MB)');
     await API.putBlob('lessonblock_' + key, payload);
     toast('\u2601 Imetumwa kwa watumiaji wote');
@@ -496,19 +501,30 @@ window.mjueCloudLessonBlockDel = function(key){
 };
 async function applyLessonBlock(key, d){
   var meta = loadMeta();
+  async function dropOld(o){
+    if(!o) return;
+    for(var i = 0; i < (o.imageKeys || []).length; i++) await aDel(o.imageKeys[i]);
+    if(o.pdfKey) await aDel(o.pdfKey);
+  }
   if(!d){
     var old = meta[key];
     if(old && old.cloud){
-      for(var i = 0; i < (old.imageKeys || []).length; i++) await aDel(old.imageKeys[i]);
-      if(old.pdfKey) await aDel(old.pdfKey);
+      await dropOld(old); await dropOld(old.en);
       delete meta[key]; localStorage.setItem(META_KEY, JSON.stringify(meta));
     }
   } else {
-    var ik = [], pk = null, o = meta[key];
-    if(o && o.cloud){ for(var j = 0; j < (o.imageKeys || []).length; j++) await aDel(o.imageKeys[j]); if(o.pdfKey) await aDel(o.pdfKey); }
-    for(var n = 0; n < (d.images || []).length; n++){ var k = 'cloud_' + key + '_img' + n; await aPut(k, d2b(d.images[n])); ik.push(k); }
-    if(d.pdf){ pk = 'cloud_' + key + '_pdf'; await aPut(pk, d2b(d.pdf)); }
-    meta[key] = { title: d.title || '', desc: d.desc || '', imageKeys: ik, pdfKey: pk, pdfName: d.pdfName || '', public: d.public !== false, updated: new Date().toISOString(), cloud: true };
+    var o = meta[key];
+    if(o && o.cloud){ await dropOld(o); await dropOld(o.en); }
+    async function store(v, prefix){
+      var ik = [], pk = null;
+      for(var n = 0; n < (v.images || []).length; n++){ var k = prefix + '_img' + n; await aPut(k, d2b(v.images[n])); ik.push(k); }
+      if(v.pdf){ pk = prefix + '_pdf'; await aPut(pk, d2b(v.pdf)); }
+      return { title: v.title || '', desc: v.desc || '', imageKeys: ik, pdfKey: pk, pdfName: v.pdfName || '' };
+    }
+    var sw = await store(d, 'cloud_' + key);
+    var entry = { title: sw.title, desc: sw.desc, imageKeys: sw.imageKeys, pdfKey: sw.pdfKey, pdfName: sw.pdfName, public: d.public !== false, updated: new Date().toISOString(), cloud: true };
+    if(d.en) entry.en = await store(d.en, 'cloud_' + key + '_en');
+    meta[key] = entry;
     localStorage.setItem(META_KEY, JSON.stringify(meta));
   }
   try{ if(window.MJUE_ADMIN && window.MJUE_ADMIN.inject) await window.MJUE_ADMIN.inject(); }catch(e){}

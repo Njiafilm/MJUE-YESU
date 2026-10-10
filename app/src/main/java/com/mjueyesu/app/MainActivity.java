@@ -1,18 +1,24 @@
 package com.mjueyesu.app;
 
 import android.annotation.SuppressLint;
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.view.WindowManager;
 import android.webkit.JavascriptInterface;
+import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
+import android.widget.Toast;
 
 import org.json.JSONObject;
 
@@ -24,12 +30,15 @@ import java.net.URL;
 import java.util.Iterator;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.FileProvider;
 import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
 
 public class MainActivity extends AppCompatActivity {
 
     private WebView webView;
+    private static final int REQ_FILE = 4711;
+    private ValueCallback<Uri[]> fileCallback;
 
     /**
      * Daraja la mtandao kwa ajili ya Cloud (Firebase). Hupitia Java ili kuepuka vikwazo vya CORS
@@ -97,6 +106,98 @@ public class MainActivity extends AppCompatActivity {
                 }
             }).start();
         }
+
+        /** Fungua PDF (base64 au data URL) kwa programu ya kusoma PDF ya simu. */
+        @JavascriptInterface
+        public void openPdf(final String b64, final String name) {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        String clean = b64 == null ? "" : b64;
+                        int comma = clean.indexOf(',');
+                        if (clean.startsWith("data:") && comma >= 0) clean = clean.substring(comma + 1);
+                        byte[] bytes = android.util.Base64.decode(clean, android.util.Base64.DEFAULT);
+                        java.io.File dir = new java.io.File(getCacheDir(), "pdfs");
+                        dir.mkdirs();
+                        String safe = (name == null || name.length() == 0 ? "file" : name).replaceAll("[^A-Za-z0-9._-]", "_");
+                        if (!safe.toLowerCase().endsWith(".pdf")) safe = safe + ".pdf";
+                        java.io.File f = new java.io.File(dir, safe);
+                        java.io.FileOutputStream fo = new java.io.FileOutputStream(f);
+                        fo.write(bytes);
+                        fo.close();
+                        final Uri uri = FileProvider.getUriForFile(MainActivity.this, getPackageName() + ".fileprovider", f);
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                try {
+                                    Intent i = new Intent(Intent.ACTION_VIEW);
+                                    i.setDataAndType(uri, "application/pdf");
+                                    i.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                                    startActivity(i);
+                                } catch (Exception e) {
+                                    Toast.makeText(MainActivity.this, "Hakuna programu ya kusoma PDF kwenye simu hii", Toast.LENGTH_LONG).show();
+                                }
+                            }
+                        });
+                    } catch (Exception e) {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(MainActivity.this, "Imeshindwa kufungua PDF", Toast.LENGTH_LONG).show();
+                            }
+                        });
+                    }
+                }
+            }).start();
+        }
+
+        /** Nakili maandishi kwenye clipboard ya simu. */
+        @JavascriptInterface
+        public void copy(final String text) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        ClipboardManager cm = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+                        cm.setPrimaryClip(ClipData.newPlainText("MJUE YESU", text == null ? "" : text));
+                        Toast.makeText(MainActivity.this, "Imenakiliwa", Toast.LENGTH_SHORT).show();
+                    } catch (Exception ignored) {}
+                }
+            });
+        }
+
+        /** Shiriki maandishi/kiungo kupitia programu nyingine. */
+        @JavascriptInterface
+        public void share(final String title, final String text, final String url) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        Intent i = new Intent(Intent.ACTION_SEND);
+                        i.setType("text/plain");
+                        if (title != null) i.putExtra(Intent.EXTRA_SUBJECT, title);
+                        String body = (text == null ? "" : text) + ((url != null && url.length() > 0) ? "\n" + url : "");
+                        i.putExtra(Intent.EXTRA_TEXT, body);
+                        startActivity(Intent.createChooser(i, "Shiriki"));
+                    } catch (Exception ignored) {}
+                }
+            });
+        }
+
+        /** Fungua kiungo cha http(s) kwenye kivinjari cha simu. */
+        @JavascriptInterface
+        public void openUrl(final String url) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        if (url == null || !(url.startsWith("http://") || url.startsWith("https://"))) return;
+                        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
+                    } catch (Exception ignored) {}
+                }
+            });
+        }
     }
 
     @SuppressLint("SetJavaScriptEnabled")
@@ -141,7 +242,33 @@ public class MainActivity extends AppCompatActivity {
         } catch (Exception ignored) {}
 
         webView.setBackgroundColor(Color.parseColor("#f3eef8"));
-        webView.setWebChromeClient(new WebChromeClient());
+        webView.setWebChromeClient(new WebChromeClient() {
+            @Override
+            public boolean onShowFileChooser(WebView view, ValueCallback<Uri[]> callback, FileChooserParams params) {
+                if (fileCallback != null) {
+                    fileCallback.onReceiveValue(null);
+                    fileCallback = null;
+                }
+                fileCallback = callback;
+                Intent intent;
+                try {
+                    intent = params.createIntent();
+                } catch (Exception e) {
+                    intent = new Intent(Intent.ACTION_GET_CONTENT);
+                    intent.addCategory(Intent.CATEGORY_OPENABLE);
+                    intent.setType("*/*");
+                }
+                try {
+                    startActivityForResult(intent, REQ_FILE);
+                } catch (Exception e) {
+                    fileCallback = null;
+                    callback.onReceiveValue(null);
+                    Toast.makeText(MainActivity.this, "Haiwezi kufungua kichagua faili", Toast.LENGTH_LONG).show();
+                    return false;
+                }
+                return true;
+            }
+        });
         webView.setWebViewClient(new WebViewClient() {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
@@ -157,6 +284,19 @@ public class MainActivity extends AppCompatActivity {
 
         webView.addJavascriptInterface(new NativeNet(), "MJUE_NATIVE");
         webView.loadUrl("file:///android_asset/www/index.html");
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQ_FILE) {
+            if (fileCallback != null) {
+                Uri[] result = WebChromeClient.FileChooserParams.parseResult(resultCode, data);
+                fileCallback.onReceiveValue(result);
+                fileCallback = null;
+            }
+            return;
+        }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     @Override
@@ -183,6 +323,10 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
+        if (fileCallback != null) {
+            fileCallback.onReceiveValue(null);
+            fileCallback = null;
+        }
         if (webView != null) {
             webView.loadUrl("about:blank");
             webView.stopLoading();
