@@ -137,7 +137,7 @@ public class MainActivity extends AppCompatActivity {
         // Faster rendering
         s.setRenderPriority(WebSettings.RenderPriority.HIGH);
         try {
-            s.setLayerType(View.LAYER_TYPE_HARDWARE, null);
+            webView.setLayerType(View.LAYER_TYPE_HARDWARE, null);
         } catch (Exception ignored) {}
 
         webView.setBackgroundColor(Color.parseColor("#f3eef8"));
