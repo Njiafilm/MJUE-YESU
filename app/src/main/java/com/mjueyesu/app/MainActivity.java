@@ -5,9 +5,13 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.pdf.PdfRenderer;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.ParcelFileDescriptor;
 import android.view.View;
 import android.view.WindowManager;
 import android.webkit.JavascriptInterface;
@@ -28,6 +32,12 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Iterator;
+
+import com.google.android.gms.tasks.Tasks;
+import com.google.mlkit.vision.common.InputImage;
+import com.google.mlkit.vision.text.TextRecognition;
+import com.google.mlkit.vision.text.TextRecognizer;
+import com.google.mlkit.vision.text.latin.TextRecognizerOptions;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
@@ -107,6 +117,92 @@ public class MainActivity extends AppCompatActivity {
                             if (webView != null) webView.evaluateJavascript(js, null);
                         }
                     });
+                }
+            }).start();
+        }
+
+        /** Soma maandishi kwenye picha au PDF (OCR ya ML Kit, bila mtandao). */
+        @JavascriptInterface
+        public void ocr(final int id, final String kind, final String b64) {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    TextRecognizer rec = null;
+                    try {
+                        String clean = b64 == null ? "" : b64;
+                        int comma = clean.indexOf(',');
+                        if (clean.startsWith("data:") && comma >= 0) clean = clean.substring(comma + 1);
+                        byte[] bytes = android.util.Base64.decode(clean, android.util.Base64.DEFAULT);
+                        rec = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS);
+                        StringBuilder sb = new StringBuilder();
+                        if ("pdf".equals(kind)) {
+                            java.io.File dir = new java.io.File(getCacheDir(), "ocr");
+                            dir.mkdirs();
+                            java.io.File f = new java.io.File(dir, "in_" + id + ".pdf");
+                            java.io.FileOutputStream fo = new java.io.FileOutputStream(f);
+                            fo.write(bytes);
+                            fo.close();
+                            ParcelFileDescriptor pfd = ParcelFileDescriptor.open(f, ParcelFileDescriptor.MODE_READ_ONLY);
+                            PdfRenderer pr = new PdfRenderer(pfd);
+                            try {
+                                int total = Math.min(pr.getPageCount(), 25);
+                                for (int i = 0; i < total; i++) {
+                                    PdfRenderer.Page page = pr.openPage(i);
+                                    int w = Math.round(page.getWidth() * 2.4f);
+                                    int h = Math.round(page.getHeight() * 2.4f);
+                                    if (w > 2600) {
+                                        h = Math.round(h * 2600f / w);
+                                        w = 2600;
+                                    }
+                                    Bitmap bmp = Bitmap.createBitmap(Math.max(w, 1), Math.max(h, 1), Bitmap.Config.ARGB_8888);
+                                    bmp.eraseColor(Color.WHITE);
+                                    page.render(bmp, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY);
+                                    page.close();
+                                    com.google.mlkit.vision.text.Text t = Tasks.await(rec.process(InputImage.fromBitmap(bmp, 0)));
+                                    bmp.recycle();
+                                    String txt = t.getText();
+                                    if (txt != null && txt.trim().length() > 0) {
+                                        if (sb.length() > 0) sb.append("\n\n");
+                                        sb.append(txt.trim());
+                                    }
+                                    progressOcr(id, i + 1, total);
+                                }
+                            } finally {
+                                pr.close();
+                                pfd.close();
+                                f.delete();
+                            }
+                        } else {
+                            BitmapFactory.Options o = new BitmapFactory.Options();
+                            o.inJustDecodeBounds = true;
+                            BitmapFactory.decodeByteArray(bytes, 0, bytes.length, o);
+                            int sample = 1;
+                            while (o.outWidth / sample > 3000 || o.outHeight / sample > 3000) sample *= 2;
+                            BitmapFactory.Options o2 = new BitmapFactory.Options();
+                            o2.inSampleSize = sample;
+                            Bitmap bmp = BitmapFactory.decodeByteArray(bytes, 0, bytes.length, o2);
+                            if (bmp == null) throw new java.io.IOException("Picha haisomeki");
+                            int rot = 0;
+                            try {
+                                android.media.ExifInterface ex = new android.media.ExifInterface(new java.io.ByteArrayInputStream(bytes));
+                                int ori = ex.getAttributeInt(android.media.ExifInterface.TAG_ORIENTATION, android.media.ExifInterface.ORIENTATION_NORMAL);
+                                if (ori == android.media.ExifInterface.ORIENTATION_ROTATE_90) rot = 90;
+                                else if (ori == android.media.ExifInterface.ORIENTATION_ROTATE_180) rot = 180;
+                                else if (ori == android.media.ExifInterface.ORIENTATION_ROTATE_270) rot = 270;
+                            } catch (Exception ignored) {
+                            }
+                            com.google.mlkit.vision.text.Text t = Tasks.await(rec.process(InputImage.fromBitmap(bmp, rot)));
+                            bmp.recycle();
+                            String txt = t.getText();
+                            if (txt != null) sb.append(txt.trim());
+                        }
+                        deliverOcr(id, true, sb.toString());
+                    } catch (Throwable e) {
+                        String msg = e.getMessage();
+                        deliverOcr(id, false, msg == null ? e.toString() : msg);
+                    } finally {
+                        if (rec != null) rec.close();
+                    }
                 }
             }).start();
         }
@@ -308,6 +404,27 @@ public class MainActivity extends AppCompatActivity {
 
         webView.addJavascriptInterface(new NativeNet(), "MJUE_NATIVE");
         webView.loadUrl("file:///android_asset/www/index.html");
+    }
+
+    private void deliverOcr(final int id, final boolean ok, final String text) {
+        final String js = "window.__mjueOcrCb&&window.__mjueOcrCb(" + id + "," + (ok ? "true" : "false") + ","
+                + JSONObject.quote(text == null ? "" : text) + ")";
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (webView != null) webView.evaluateJavascript(js, null);
+            }
+        });
+    }
+
+    private void progressOcr(final int id, final int done, final int total) {
+        final String js = "window.__mjueOcrProg&&window.__mjueOcrProg(" + id + "," + done + "," + total + ")";
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (webView != null) webView.evaluateJavascript(js, null);
+            }
+        });
     }
 
     /** Soma faili zilizochaguliwa na utume kwa JS vipande vipande (base64). */

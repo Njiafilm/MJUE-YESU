@@ -252,6 +252,79 @@
   watchInput('adminImages', 'picha');
   watchInput('adminPdf', 'PDF');
 
+  /* ---------- Kusoma maandishi (OCR) kwenye picha na PDF kisha kuyaweka kwenye "Maelezo" ---------- */
+  var ocrPend = {}, ocrSeq = 1, ocrBusy = false;
+  window.__mjueOcrCb = function(id, ok, payload){
+    var p = ocrPend[id]; if(!p) return;
+    delete ocrPend[id];
+    clearTimeout(p.t);
+    if(ok) p.res(String(payload || '')); else p.rej(new Error(String(payload || 'Hitilafu')));
+  };
+  window.__mjueOcrProg = function(id, done, total){ var p = ocrPend[id]; if(p && p.prog) p.prog(done, total); };
+  function ocrOne(blob, kind, prog){
+    return new Promise(function(res, rej){
+      if(!hasNative('ocr')){ rej(new Error('Kusoma maandishi kunapatikana kwenye app ya simu pekee')); return; }
+      blobToB64(blob).then(function(d){
+        var id = ocrSeq++;
+        var t = setTimeout(function(){ if(ocrPend[id]){ delete ocrPend[id]; rej(new Error('Imechukua muda mrefu mno')); } }, 300000);
+        ocrPend[id] = { res: res, rej: rej, prog: prog, t: t };
+        try{ window.MJUE_NATIVE.ocr(id, kind, d); }catch(e){ delete ocrPend[id]; clearTimeout(t); rej(e); }
+      }).catch(rej);
+    });
+  }
+  function cleanOcr(t){
+    return String(t || '').replace(/\r/g, '').replace(/[ \t]+\n/g, '\n').replace(/\n{3,}/g, '\n\n').trim();
+  }
+  function putDesc(text, replace){
+    var ta = document.getElementById('adminDesc');
+    if(!ta) return;
+    ta.value = (replace || !ta.value.trim()) ? text : ta.value.replace(/\s+$/, '') + '\n\n' + text;
+    try{ ta.dispatchEvent(new Event('input', { bubbles: true })); }catch(e){}
+  }
+  async function ocrItems(items, replace){
+    if(!items.length) return;
+    if(!hasNative('ocr')){ upStatus('⚠ Kusoma maandishi kunapatikana kwenye app ya simu pekee.'); return; }
+    if(ocrBusy){ upStatus('⏳ Kusoma maandishi kunaendelea, subiri…'); return; }
+    ocrBusy = true;
+    var got = [];
+    try{
+      for(var i = 0; i < items.length; i++){
+        var it = items[i];
+        var label = it.kind === 'pdf' ? 'PDF' : 'picha ' + (i + 1) + '/' + items.length;
+        upStatus('🔍 Inasoma maandishi (' + label + ')…');
+        var txt = cleanOcr(await ocrOne(it.blob, it.kind, function(d, t){ upStatus('🔍 Inasoma maandishi (' + label + ') ukurasa ' + d + '/' + t + '…'); }));
+        if(txt) got.push(txt);
+      }
+      var all = got.join('\n\n');
+      if(!all){ upStatus('⚠ Hakuna maandishi yaliyoonekana. Jaribu picha iliyo wazi zaidi.'); return; }
+      putDesc(all, !!replace);
+      upStatus('✅ Maandishi (herufi ' + all.length + ') yameongezwa kwenye Maelezo. Yahakiki, kisha bofya Hifadhi.');
+    }catch(e){
+      upStatus('❌ Imeshindwa kusoma maandishi: ' + ((e && e.message) || e));
+    }finally{ ocrBusy = false; }
+  }
+  // Kiotomatiki mara tu picha/PDF inapopakiwa
+  window.MJUE_AFTER_UPLOAD = function(kind, files){
+    var items = [];
+    [].forEach.call(files || [], function(f){ if(f) items.push({ kind: kind, blob: f }); });
+    ocrItems(items, false);
+  };
+  // Kwa mkono: soma tena picha/PDF zote za lugha hii na ubadilishe Maelezo
+  var ocrBtn = document.getElementById('adminOcr');
+  if(ocrBtn) ocrBtn.addEventListener('click', async function(){
+    var items = [];
+    try{
+      var keys = window.__adminImageKeys || [];
+      for(var i = 0; i < keys.length; i++){ var b = await idbGet(keys[i]); if(b) items.push({ kind: 'image', blob: b }); }
+      var pdf = window.__adminPdf || (window.__adminPdfKey ? await idbGet(window.__adminPdfKey) : null);
+      if(pdf && !window.__adminPdfRemoved) items.push({ kind: 'pdf', blob: pdf });
+    }catch(e){}
+    if(!items.length){ upStatus('⚠ Hakuna picha au PDF ya kusoma. Pakia kwanza.'); return; }
+    var ta = document.getElementById('adminDesc');
+    if(ta && ta.value.trim() && !confirm('Maelezo yaliyopo yatabadilishwa na maandishi yaliyosomwa. Endelea?')) return;
+    ocrItems(items, true);
+  });
+
   /* ---------- Viungo vya mafungu kila mahali (maandishi yoyote yenye jina la kitabu cha Biblia) ---------- */
   var SKIP = 'a,button,textarea,input,select,script,style,[contenteditable="true"],.ref-link,#verseSheet,#bibleReader,.lesson-day-banner';
   function linkTextIn(root){
