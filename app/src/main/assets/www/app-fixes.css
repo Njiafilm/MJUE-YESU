@@ -80,3 +80,8 @@
 }
 .admin-lang-note{font-size:11px;color:var(--muted,#6b5b7a);margin:4px 0 0}
 #adminPdfName button{margin-left:8px;border:1px solid #b33;background:#fff;color:#b33;border-radius:8px;font-size:12px;padding:3px 8px}
+
+/* ===== 6. Hali ya upakiaji na vitufe vya njia mbadala (dashboard) ===== */
+.admin-status{margin:6px 0 4px;font-size:13px;font-weight:700;color:var(--brown-dark,#4A1D6E);min-height:1.2em;line-height:1.4}
+.alt-pick{margin:6px 0 2px}
+.alt-pick[hidden]{display:none!important}

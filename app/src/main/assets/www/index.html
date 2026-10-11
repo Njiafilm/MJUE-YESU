@@ -1596,6 +1596,7 @@ h2 {
     <select id="adminLessonSel"></select>
     <label>Lugha ya maudhui hapa chini</label>
     <select id="adminLang"><option value="sw">🇹🇿 Kiswahili</option><option value="en">🇬🇧 English</option></select>
+    <button type="button" class="btn-a btn-sec" id="adminTranslate" style="margin:6px 0 2px;width:100%">🌐 Tafsiri</button>
     <p class="admin-lang-note">Chagua lugha, jaza kichwa, maelezo, picha na PDF, kisha Hifadhi. Rudia kwa lugha nyingine. Watumiaji wataona kitufe cha kubadili Kiswahili / English.</p>
     <label>Kichwa / mada</label>
     <input type="text" id="adminTitle" placeholder="Kichwa cha somo">
@@ -1603,10 +1604,13 @@ h2 {
     <textarea id="adminDesc" placeholder="Andika maelezo ya somo..."></textarea>
     <label>Picha (unaweza kuchagua nyingi)</label>
     <input type="file" id="adminImages" accept="image/*" multiple>
+    <button type="button" class="btn-a btn-sec alt-pick" data-pick="image" hidden>📂 Chagua picha (njia mbadala)</button>
     <div id="adminImgPreview"></div>
     <label>PDF (hadi 4 MB ili itumwe kwa watumiaji wote)</label>
     <input type="file" id="adminPdf" accept="application/pdf">
+    <button type="button" class="btn-a btn-sec alt-pick" data-pick="pdf" hidden>📂 Chagua PDF (njia mbadala)</button>
     <div class="admin-file-list" id="adminPdfName"></div>
+    <div class="admin-status" id="adminStatus" aria-live="polite"></div>
     <label>Chapisha hadharani?</label>
     <select id="adminPublic">
       <option value="1">Ndiyo — ionekane hadharani</option>
@@ -1624,7 +1628,7 @@ h2 {
     <div id="adminPreviewBox" style="display:none;margin-top:12px;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--soft);max-height:240px;overflow:auto;font-size:13px"></div>
   </div>
 </div>
-<div class="footer-note">MJUE YESU · Toleo 3.1</div>
+<div class="footer-note">MJUE YESU · Toleo 3.2</div>
 </div>
 
 
@@ -3483,6 +3487,7 @@ if ('serviceWorker' in navigator) {
     if($("adminHello")) $("adminHello").textContent = USER;
     fillLessonSelect(true);
     loadLessonForm();
+    openDB().then(()=>{}, (err)=>{ setStatus("⚠ Hifadhi ya picha/PDF haipatikani kwenye kifaa hiki: " + ((err && (err.message || err.name)) || err)); });
   }
 
   function fillLessonSelect(force){
@@ -3516,6 +3521,13 @@ if ('serviceWorker' in navigator) {
     sel.appendChild(add);
   }
 
+  function setStatus(msg){ const el = $("adminStatus"); if(el) el.textContent = msg || ""; }
+  function updateTranslateLabel(){
+    const b = $("adminTranslate"); if(!b) return;
+    const to = curLang(), from = to === "en" ? "sw" : "en";
+    const nm = (l)=> l === "en" ? "English" : "Kiswahili";
+    b.textContent = "🌐 Tafsiri kutoka " + nm(from) + " → " + nm(to);
+  }
   function curLang(){ const el=$("adminLang"); return (el && el.value==="en") ? "en" : "sw"; }
   function getLang(){ try{ return localStorage.getItem("mjue_lang")==="en" ? "en" : "sw"; }catch(e){ return "sw"; } }
   function variantOf(m, lang){ m = m || {}; return lang==="en" ? (m.en || {}) : m; }
@@ -3533,6 +3545,8 @@ if ('serviceWorker' in navigator) {
     if(!sel) return;
     let key = sel.value;
     const lang = curLang();
+    window.__adminPrevLang = lang;
+    updateTranslateLabel();
     window.__adminImages = [];
     window.__adminImageKeys = [];
     window.__adminPdf = null;
@@ -3628,44 +3642,94 @@ if ('serviceWorker' in navigator) {
   });
 
   $("adminLessonSel")?.addEventListener("change", ()=>loadLessonForm());
-  $("adminLang")?.addEventListener("change", ()=>loadLessonForm());
+  async function autoTranslateInto(from, to, title, desc){
+    const TR = window.MJUE_TR;
+    if(!TR){ setStatus("❌ Tafsiri haipatikani."); return; }
+    setStatus("🌐 Inatafsiri kuwa " + (to==="en"?"English":"Kiswahili") + "…");
+    try{
+      if((title||"").trim()) $("adminTitle").value = await TR.translate(title, from, to);
+      if((desc||"").trim()) $("adminDesc").value = await TR.translate(desc, from, to);
+      setStatus("✅ Imetafsiriwa. Hakiki/hariri maneno, kisha bofya Hifadhi.");
+    }catch(err){ setStatus("❌ Haikuweza kutafsiri (hakuna mtandao?): " + ((err && err.message) || err)); }
+  }
+  $("adminLang")?.addEventListener("change", async ()=>{
+    const newLang = curLang(), oldLang = window.__adminPrevLang || (newLang === "en" ? "sw" : "en");
+    if(newLang === oldLang){ return; }
+    const oldTitle = $("adminTitle").value || "", oldDesc = $("adminDesc").value || "";
+    try{ await persistCurrent(oldLang, false, false); }catch(e){}
+    await loadLessonForm();
+    const empty = !$("adminTitle").value.trim() && !$("adminDesc").value.trim();
+    if(empty && (oldTitle.trim() || oldDesc.trim())) await autoTranslateInto(oldLang, newLang, oldTitle, oldDesc);
+  });
+  $("adminTranslate")?.addEventListener("click", async ()=>{
+    const to = curLang(), from = to === "en" ? "sw" : "en";
+    let key = $("adminLessonSel").value;
+    if(key === "__new__"){ setStatus("⚠ Hifadhi ukurasa kwanza, kisha tafsiri."); return; }
+    if(/^\d+$/.test(key)) key = "lesson_"+key;
+    const src = variantOf(loadMeta()[key], from);
+    if(!(src.title||"").trim() && !(src.desc||"").trim()){
+      setStatus("⚠ Hakuna maandishi ya " + (from==="en"?"English":"Kiswahili") + " yaliyohifadhiwa ya kutafsiri. Andika na ubofye Hifadhi kwanza.");
+      return;
+    }
+    if(($("adminTitle").value.trim() || $("adminDesc").value.trim()) && !confirm("Maandishi yaliyopo kwenye kisanduku yatabadilishwa na tafsiri. Endelea?")) return;
+    await autoTranslateInto(from, to, src.title || "", src.desc || "");
+  });
 
-  $("adminImages")?.addEventListener("change", async (e)=>{
-    const files = Array.from(e.target.files||[]);
+  async function addImages(files){
+    files = files || [];
+    if(!files.length){ setStatus("⚠ Hakuna picha iliyochaguliwa."); return; }
+    setStatus("⏳ Inachakata picha " + files.length + "…");
+    let ok = 0, lastErr = "";
     for(const f of files){
-      const blob = await compressImage(f);
-      const key = "img_"+Date.now()+"_"+Math.random().toString(36).slice(2,8);
-      await idbPut("files", key, blob);
-      window.__adminImageKeys = window.__adminImageKeys || [];
-      window.__adminImageKeys.push(key);
-      window.__adminImages = window.__adminImages || [];
-      window.__adminImages.push(URL.createObjectURL(blob));
+      try{
+        const blob = await compressImage(f);
+        const key = "img_"+Date.now()+"_"+Math.random().toString(36).slice(2,8);
+        await idbPut("files", key, blob);
+        window.__adminImageKeys = window.__adminImageKeys || [];
+        window.__adminImageKeys.push(key);
+        window.__adminImages = window.__adminImages || [];
+        window.__adminImages.push(URL.createObjectURL(blob));
+        ok++;
+      }catch(err){ lastErr = (err && (err.message || err.name)) || String(err); }
     }
     renderImgPreview();
+    if(ok && !lastErr) setStatus("✅ Picha " + ok + " zimeongezwa. Bofya Hifadhi.");
+    else if(ok) setStatus("⚠ Picha " + ok + " zimeongezwa, nyingine zimeshindwa: " + lastErr);
+    else setStatus("❌ Picha haikuhifadhiwa: " + lastErr);
+  }
+  async function setPdfFile(f){
+    if(!f){ setStatus("⚠ Hakuna PDF iliyochaguliwa."); return; }
+    if(f.size > 15e6){ setStatus("❌ PDF ni kubwa sana (>15MB)."); alert("PDF ni kubwa sana (>15MB)."); return; }
+    try{
+      const key = "pdf_"+Date.now();
+      await idbPut("files", key, f);
+      window.__adminPdfKey = key;
+      window.__adminPdf = f;
+      window.__adminPdfName = f.name || "file.pdf";
+      window.__adminPdfRemoved = false;
+      pdfNameLine();
+      setStatus("✅ PDF imeongezwa: " + (f.name || "file.pdf") + ". Bofya Hifadhi.");
+    }catch(err){ setStatus("❌ PDF haikuhifadhiwa: " + ((err && (err.message || err.name)) || err)); }
+  }
+  $("adminImages")?.addEventListener("change", async (e)=>{
+    const files = Array.from(e.target.files||[]);
+    await addImages(files);
     e.target.value = "";
   });
 
   $("adminPdf")?.addEventListener("change", async (e)=>{
     const f = e.target.files && e.target.files[0];
-    if(!f) return;
-    if(f.size > 15e6){ alert("PDF ni kubwa sana (>15MB)."); e.target.value = ""; return; }
-    const key = "pdf_"+Date.now();
-    await idbPut("files", key, f);
-    window.__adminPdfKey = key;
-    window.__adminPdf = f;
-    window.__adminPdfName = f.name;
-    window.__adminPdfRemoved = false;
-    pdfNameLine();
+    await setPdfFile(f);
     e.target.value = "";
   });
 
-  $("adminSave")?.addEventListener("click", async ()=>{
+  async function persistCurrent(lang, push, allowNew){
     const selEl = $("adminLessonSel");
-    const selBefore = selEl.value;
-    let key = selBefore;
-    if(key === "__new__") key = "page_"+Date.now();
-    else if(/^\d+$/.test(key)) key = "lesson_"+key;
-    const lang = curLang();
+    let key = selEl.value;
+    if(key === "__new__"){
+      if(!allowNew) return null;
+      key = "page_"+Date.now();
+    } else if(/^\d+$/.test(key)) key = "lesson_"+key;
     const meta = loadMeta();
     const prev = meta[key] || {};
     const prevV = variantOf(prev, lang);
@@ -3677,6 +3741,9 @@ if ('serviceWorker' in navigator) {
       pdfKey: removed ? null : (window.__adminPdfKey || prevV.pdfKey || null),
       pdfName: removed ? "" : (window.__adminPdfName || prevV.pdfName || "")
     };
+    const same = JSON.stringify([variant.title, variant.desc, variant.imageKeys, variant.pdfKey, variant.pdfName]) ===
+                 JSON.stringify([prevV.title||"", prevV.desc||"", prevV.imageKeys||[], prevV.pdfKey||null, prevV.pdfName||""]);
+    if(same && !push) return key;
     const entry = Object.assign({}, prev);
     if(lang === "en"){
       entry.en = variant;
@@ -3693,10 +3760,21 @@ if ('serviceWorker' in navigator) {
       if(prevV.pdfKey && prevV.pdfKey !== variant.pdfKey) await idbDelete("files", prevV.pdfKey);
     }catch(e){}
     window.__adminPdfRemoved = false;
-    if(window.mjueCloudLessonBlock) window.mjueCloudLessonBlock(key, entry);
+    if(push && window.mjueCloudLessonBlock) window.mjueCloudLessonBlock(key, entry);
+    return key;
+  }
+
+  $("adminSave")?.addEventListener("click", async ()=>{
+    const selEl = $("adminLessonSel");
+    const selBefore = selEl.value;
+    setStatus("⏳ Inahifadhi…");
+    let key;
+    try{ key = await persistCurrent(curLang(), true, true); }
+    catch(err){ setStatus("❌ Haikuhifadhiwa: " + ((err && (err.message || err.name)) || err)); return; }
     alert(window.MJUE_CLOUD&&window.MJUE_CLOUD.on?"Imehifadhiwa. Inatumwa kwa watumiaji wote…":"Imehifadhiwa (IndexedDB + meta).");
     fillLessonSelect(true);
     selEl.value = (selBefore === "__new__") ? key : selBefore;
+    setStatus("✅ Imehifadhiwa (" + (curLang()==="en" ? "English" : "Kiswahili") + ").");
     await injectPublicBlocks();
   });
 
@@ -3727,17 +3805,19 @@ if ('serviceWorker' in navigator) {
     return String(s||"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
   }
 
-  async function renderPublicBlock(data){
+  async function renderPublicBlock(data, forceLang){
     if(!data) return "";
     const has = (v)=> !!(v && (v.title || v.desc || (v.imageKeys||[]).length || v.pdfKey));
     const hasSw = has(data), hasEn = has(data.en);
-    let lang = getLang();
-    if(lang === "en" && !hasEn) lang = "sw";
-    if(lang === "sw" && !hasSw && hasEn) lang = "en";
+    let lang = forceLang || getLang();
+    if(!forceLang){
+      if(lang === "en" && !hasEn) lang = "sw";
+      if(lang === "sw" && !hasSw && hasEn) lang = "en";
+    }
     const v = lang === "en" ? (data.en || {}) : data;
     const tag = lang === "en" ? "ADMIN CONTENT" : "MAUDHUI YA ADMIN";
     let html = '<div class="public-admin-block" data-lang="'+lang+'"><div class="pab-head"><span class="pab-tag">'+tag+'</span>';
-    if(hasSw && hasEn){
+    if(!forceLang && hasSw && hasEn){
       html += '<span class="lang-pills"><button type="button" data-lang="sw" class="'+(lang==="sw"?"on":"")+'">Kiswahili</button><button type="button" data-lang="en" class="'+(lang==="en"?"on":"")+'">English</button></span>';
     }
     html += '</div>';
@@ -3817,25 +3897,31 @@ if ('serviceWorker' in navigator) {
   $("adminPreview")?.addEventListener("click", async ()=>{
     const box = $("adminPreviewBox");
     if(!box) return;
-    await injectPublicBlocks();
-    const store = loadMeta();
-    let key = $("adminLessonSel")?.value;
-    if(!key || key === "__new__"){ box.style.display="block"; box.innerHTML="<i>Chagua somo kisha Hifadhi kwanza.</i>"; return; }
-    if(/^\d+$/.test(key)) key = "lesson_"+key;
-    const data = store[key];
-    if(!data){ box.style.display="block"; box.innerHTML="<b>Bado haijahifadhiwa.</b> Bofya Hifadhi kwanza."; return; }
-    box.style.display="block";
-    box.innerHTML = await renderPublicBlock(data);
-    // Also jump to Lesoni tab so user sees public list
-    if(typeof window.tab === 'function') window.tab('lesoni');
-    else {
-      document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
-      document.getElementById('lesoni')?.classList.add('active');
+    const lang = curLang();
+    const removed = !!window.__adminPdfRemoved;
+    const v = {
+      title: ($("adminTitle").value||"").trim(),
+      desc: ($("adminDesc").value||"").trim(),
+      imageKeys: (window.__adminImageKeys || []).slice(),
+      pdfKey: removed ? null : (window.__adminPdfKey || null),
+      pdfName: removed ? "" : (window.__adminPdfName || "")
+    };
+    box.style.display = "block";
+    box.style.maxHeight = "none";
+    try{
+      if(!v.title && !v.desc && !v.imageKeys.length && !v.pdfKey){
+        box.innerHTML = "<i>Hakuna cha kuonyesha bado. Andika kichwa/maelezo au chagua picha/PDF.</i>";
+      } else {
+        box.innerHTML = await renderPublicBlock(lang === "en" ? { en: v } : v, lang);
+      }
+    }catch(err){
+      box.innerHTML = "<b>Imeshindwa kuonyesha:</b> " + escapeHtml((err && (err.message || err.name)) || String(err));
     }
-    alert("Maudhui yameonyeshwa chini ya fomu na kwenye tabu Lesoni (ikiwa Chapisha hadharani = Ndiyo).");
+    try{ box.scrollIntoView({ block: "center", behavior: "smooth" }); }catch(e){}
   });
 
   window.MJUE_ADMIN = { open: openOverlay, inject: injectPublicBlocks, openDB };
+  window.MJUE_ADMIN_UPLOAD = { addImages: addImages, setPdf: setPdfFile, status: setStatus };
 })();
 </script>
 
@@ -4099,7 +4185,7 @@ if ('serviceWorker' in navigator) {
     node.parentNode.replaceChild(frag,node);
   }
   function linkify(root){
-    root.querySelectorAll('.lesson-copy,.lesson-read,.lesson-soma .soma-text,.lesson-question,.lesson-reflection,.lesson-discuss,.key-point,.lesson-memory p,.lesson-memory .ref,.lesson-cover > p,.lesson-further p').forEach(function(box){
+    root.querySelectorAll('.lesson-copy,.lesson-read,.lesson-soma .soma-text,.lesson-question,.lesson-reflection,.lesson-discuss,.key-point,.lesson-memory p,.lesson-memory .ref,.lesson-cover > p,.lesson-further p,.lesson-page-title,.lesson-cover h1,.lesson-further-title,.lesson-prayer').forEach(function(box){
       var w=document.createTreeWalker(box,NodeFilter.SHOW_TEXT,{acceptNode:function(n){
         return n.parentNode.closest('a,button,.pass-btn,.ref-link')?NodeFilter.FILTER_REJECT:NodeFilter.FILTER_ACCEPT;}});
       var list=[],n; while((n=w.nextNode())) list.push(n);
@@ -4187,7 +4273,7 @@ if ('serviceWorker' in navigator) {
   }
   var b0=document.getElementById('lessonReaderBody');
   if(b0) new MutationObserver(function(){enhance();}).observe(b0,{childList:true});
-  window.MJUE_EXTRAS={enhance:enhance,openSheet:openSheet,linkify:linkify};
+  window.MJUE_EXTRAS={enhance:enhance,openSheet:openSheet,linkify:linkify,linkNode:linkNode};
 
   /* ===================== 5. BIBLIA YA KIINGEREZA CHA KJV KISWAHILI (offline) ===================== */
   var sc=document.createElement('script'); sc.src='bible/kjv_sw.js';

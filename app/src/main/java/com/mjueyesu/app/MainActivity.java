@@ -38,6 +38,8 @@ public class MainActivity extends AppCompatActivity {
 
     private WebView webView;
     private static final int REQ_FILE = 4711;
+    private static final int REQ_PICK = 4712;
+    private String pickKind = "image";
     private ValueCallback<Uri[]> fileCallback;
 
     /**
@@ -59,7 +61,9 @@ public class MainActivity extends AppCompatActivity {
                         if (!"https".equals(u.getScheme()) || host == null
                                 || !(host.equals("firestore.googleapis.com")
                                 || host.equals("identitytoolkit.googleapis.com")
-                                || host.equals("securetoken.googleapis.com"))) {
+                                || host.equals("securetoken.googleapis.com")
+                                || host.equals("translate.googleapis.com")
+                                || host.equals("api.mymemory.translated.net"))) {
                             throw new java.io.IOException("blocked host");
                         }
                         HttpURLConnection c = (HttpURLConnection) new URL(url).openConnection();
@@ -105,6 +109,26 @@ public class MainActivity extends AppCompatActivity {
                     });
                 }
             }).start();
+        }
+
+        /** Chagua picha/PDF kwa njia ya moja kwa moja (mbadala wa kichagua faili cha WebView). */
+        @JavascriptInterface
+        public void pickFile(final String kind, final boolean multiple) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        pickKind = "pdf".equals(kind) ? "pdf" : "image";
+                        Intent i = new Intent(Intent.ACTION_GET_CONTENT);
+                        i.addCategory(Intent.CATEGORY_OPENABLE);
+                        i.setType("pdf".equals(pickKind) ? "application/pdf" : "image/*");
+                        if (multiple) i.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+                        startActivityForResult(Intent.createChooser(i, "Chagua faili"), REQ_PICK);
+                    } catch (Exception e) {
+                        Toast.makeText(MainActivity.this, "Haiwezi kufungua kichagua faili", Toast.LENGTH_LONG).show();
+                    }
+                }
+            });
         }
 
         /** Fungua PDF (base64 au data URL) kwa programu ya kusoma PDF ya simu. */
@@ -286,8 +310,84 @@ public class MainActivity extends AppCompatActivity {
         webView.loadUrl("file:///android_asset/www/index.html");
     }
 
+    /** Soma faili zilizochaguliwa na utume kwa JS vipande vipande (base64). */
+    private void deliverPicked(final int resultCode, final Intent data, final String kind) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    if (resultCode != RESULT_OK || data == null) return;
+                    java.util.ArrayList<Uri> uris = new java.util.ArrayList<Uri>();
+                    if (data.getClipData() != null) {
+                        for (int i = 0; i < data.getClipData().getItemCount(); i++) {
+                            uris.add(data.getClipData().getItemAt(i).getUri());
+                        }
+                    } else if (data.getData() != null) {
+                        uris.add(data.getData());
+                    }
+                    int fileId = 0;
+                    for (Uri u : uris) {
+                        fileId++;
+                        String name = "file";
+                        android.database.Cursor c = null;
+                        try {
+                            c = getContentResolver().query(u, null, null, null, null);
+                            if (c != null && c.moveToFirst()) {
+                                int ix = c.getColumnIndex(android.provider.OpenableColumns.DISPLAY_NAME);
+                                if (ix >= 0) name = c.getString(ix);
+                            }
+                        } catch (Exception ignored) {
+                        } finally {
+                            if (c != null) c.close();
+                        }
+                        String mime = getContentResolver().getType(u);
+                        InputStream in = getContentResolver().openInputStream(u);
+                        if (in == null) continue;
+                        ByteArrayOutputStream bo = new ByteArrayOutputStream();
+                        byte[] buf = new byte[16384];
+                        int n;
+                        int total = 0;
+                        while ((n = in.read(buf)) > 0) {
+                            bo.write(buf, 0, n);
+                            total += n;
+                            if (total > 20 * 1024 * 1024) throw new java.io.IOException("too big");
+                        }
+                        in.close();
+                        String b64 = android.util.Base64.encodeToString(bo.toByteArray(), android.util.Base64.NO_WRAP);
+                        if (b64.length() == 0) continue;
+                        int ch = 240000;
+                        for (int off = 0; off < b64.length(); off += ch) {
+                            final String part = b64.substring(off, Math.min(b64.length(), off + ch));
+                            final boolean last = off + ch >= b64.length();
+                            final String js = "window.__mjuePick&&window.__mjuePick('" + kind + "'," + fileId + ","
+                                    + JSONObject.quote(name) + "," + JSONObject.quote(mime == null ? "" : mime)
+                                    + ",'" + part + "'," + (last ? "true" : "false") + ")";
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    if (webView != null) webView.evaluateJavascript(js, null);
+                                }
+                            });
+                        }
+                    }
+                } catch (Exception e) {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(MainActivity.this, "Imeshindwa kusoma faili", Toast.LENGTH_LONG).show();
+                        }
+                    });
+                }
+            }
+        }).start();
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQ_PICK) {
+            deliverPicked(resultCode, data, pickKind);
+            return;
+        }
         if (requestCode == REQ_FILE) {
             if (fileCallback != null) {
                 Uri[] result = WebChromeClient.FileChooserParams.parseResult(resultCode, data);
