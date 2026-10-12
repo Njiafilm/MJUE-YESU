@@ -1629,7 +1629,7 @@ h2 {
     <div id="adminPreviewBox" style="display:none;margin-top:12px;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--soft);max-height:240px;overflow:auto;font-size:13px"></div>
   </div>
 </div>
-<div class="footer-note">MJUE YESU · Toleo 3.3</div>
+<div class="footer-note">MJUE YESU · Toleo 3.5</div>
 </div>
 
 
@@ -3853,7 +3853,8 @@ if ('serviceWorker' in navigator) {
       const isQ4 = /Q4/.test((smallEl && smallEl.textContent) || "");
       if(m && isQ4){
         const data = store["lesson_"+m[1]];
-        if(data && data.public !== false){
+        const hasC2 = (v)=> !!(v && (v.title || v.desc || (v.imageKeys||[]).length || v.pdfKey));
+        if(data && data.public !== false && (hasC2(data) || hasC2(data.en))){
           body.insertAdjacentHTML("afterbegin", await renderPublicBlock(data));
         }
       }
@@ -3871,9 +3872,10 @@ if ('serviceWorker' in navigator) {
     }
     host = document.getElementById("adminPublicPages");
     if(host){
+      const hasC = (v)=> !!(v && (v.title || v.desc || (v.imageKeys||[]).length || v.pdfKey));
       const pages = Object.keys(store).filter(k=>{
         const d = store[k];
-        return d && d.public !== false && (k.startsWith("page_") || k.startsWith("lesson_"));
+        return d && d.public !== false && k.startsWith("page_") && (hasC(d) || hasC(d.en));
       }).sort();
       if(!pages.length){ host.innerHTML = ""; return; }
       let html = '<h3 style="color:#6B2D9B;margin:16px 0 10px;font-family:Georgia,serif">Maudhui yaliyoongezwa (Admin)</h3>';
@@ -4276,7 +4278,7 @@ if ('serviceWorker' in navigator) {
   }
   var b0=document.getElementById('lessonReaderBody');
   if(b0) new MutationObserver(function(){enhance();}).observe(b0,{childList:true});
-  window.MJUE_EXTRAS={enhance:enhance,openSheet:openSheet,linkify:linkify,linkNode:linkNode};
+  window.MJUE_EXTRAS={enhance:enhance,openSheet:openSheet,linkify:linkify,linkNode:linkNode,questions:Q};
 
   /* ===================== 5. BIBLIA YA KIINGEREZA CHA KJV KISWAHILI (offline) ===================== */
   var sc=document.createElement('script'); sc.src='bible/kjv_sw.js';
@@ -4370,7 +4372,8 @@ if ('serviceWorker' in navigator) {
   var toast=document.createElement('div'); toast.className='edit-toast'; document.body.appendChild(toast);
   function say(t){toast.textContent=t;toast.classList.add('show');setTimeout(function(){toast.classList.remove('show');},1800);}
 
-  var orig=[], key=null, editing=false;
+  var orig=[], metaOrig=[], key=null, editing=false;
+  function metas(){return [].slice.call(body.querySelectorAll('.lesson-day-banner .day-meta'));}
   function admin(){try{return sessionStorage.getItem(SESSION)==='1';}catch(e){return false;}}
   function lessonKey(){
     var t=(document.getElementById('lessonReaderTitle')||{}).textContent||'';
@@ -4383,6 +4386,7 @@ if ('serviceWorker' in navigator) {
   function clean(html){
     var d=document.createElement('div'); d.innerHTML=html;
     d.querySelectorAll('script,style,iframe,object,embed').forEach(function(n){n.remove();});
+    d.querySelectorAll('a.ref-link').forEach(function(a){a.replaceWith(document.createTextNode(a.textContent));});
     d.querySelectorAll('*').forEach(function(n){[].slice.call(n.attributes).forEach(function(a){if(/^on/i.test(a.name)||/^\s*javascript:/i.test(a.value)) n.removeAttribute(a.name);});});
     return d.innerHTML;
   }
@@ -4395,9 +4399,10 @@ if ('serviceWorker' in navigator) {
     if(/Q4/.test(sm0) && !first.getAttribute('data-mjue-x')) return;   // subiri makala ya Ijumaa/viungo viwekwe kwanza
     first.setAttribute('data-mjue-e','1');
     key=lessonKey(); if(!key) return;
-    var list=els(); orig=list.map(function(e){return e.innerHTML;});
+    var list=els(); orig=list.map(function(e){return clean(e.innerHTML);});
     var saved=store();
     list.forEach(function(e,i){e.setAttribute('data-edit',i); if(saved[i]!=null) e.innerHTML=saved[i];});
+    metaOrig=[]; metas().forEach(function(e,j){e.setAttribute('data-edit-m',j); metaOrig[j]=clean(e.innerHTML); if(saved['m'+j]!=null) e.innerHTML=saved['m'+j];});
     btn.classList.toggle('show',admin());
     if(editing) setEditing(false);
   }
@@ -4409,11 +4414,13 @@ if ('serviceWorker' in navigator) {
   function setEditing(on){
     editing=on; body.classList.toggle('editing',on); bar.classList.toggle('show',on);
     els().forEach(function(e){ if(on){e.setAttribute('contenteditable','true');e.setAttribute('spellcheck','false');} else {e.removeAttribute('contenteditable');} });
+    metas().forEach(function(e){ if(on){e.setAttribute('contenteditable','true');e.setAttribute('spellcheck','false');} else {e.removeAttribute('contenteditable');} });
     body.style.paddingBottom=on?'90px':'';
     btn.textContent=on?'✔':'✏️';
   }
   function collect(){
     var saved={}; els().forEach(function(e){var i=+e.getAttribute('data-edit'); var h=clean(e.innerHTML); if(!isNaN(i)&&h!==orig[i]) saved[i]=h;});
+    metas().forEach(function(e){var j=+e.getAttribute('data-edit-m'); if(isNaN(j)) return; var h=clean(e.innerHTML); if(h!==metaOrig[j]) saved['m'+j]=h;});
     return saved;
   }
   function save(){
@@ -4421,6 +4428,7 @@ if ('serviceWorker' in navigator) {
     try{ if(n) localStorage.setItem('mjue_edit_'+key,JSON.stringify(s)); else localStorage.removeItem('mjue_edit_'+key); }catch(e){say('Imeshindwa kuhifadhi');return;}
     if(window.mjueCloudLessonEdit) window.mjueCloudLessonEdit(key,n?s:null);
     els().forEach(function(e){var i=+e.getAttribute('data-edit'); if(s[i]!=null) e.innerHTML=s[i];});
+    metas().forEach(function(e){var j=+e.getAttribute('data-edit-m'); if(s['m'+j]!=null) e.innerHTML=s['m'+j];});
     setEditing(false); say(n?('Imehifadhiwa ('+n+' sehemu)'):'Hakuna mabadiliko');
   }
   function reopen(){ var f=window.mjueOpenLesson||window.openLesson; if(typeof f==='function') f(key); }

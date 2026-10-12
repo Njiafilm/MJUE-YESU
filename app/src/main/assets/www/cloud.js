@@ -295,6 +295,7 @@ function renderDaily(){
   } else { t.textContent = DAILY_ORIG.t; r.textContent = DAILY_ORIG.r; }
 }
 function applyDaily(d){ DAILY = d; renderDaily(); }
+API.setDailyDefault = function(t, r){ DAILY_ORIG = { t: t, r: r }; renderDaily(); };
 API.getDaily = function(){ return DAILY; };
 document.addEventListener('visibilitychange', function(){ if(!document.hidden) renderDaily(); });
 

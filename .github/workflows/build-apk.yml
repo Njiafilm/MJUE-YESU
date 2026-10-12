@@ -3,6 +3,8 @@ on:
   workflow_dispatch:
   push:
     branches: [ main, master ]
+permissions:
+  contents: write
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -17,7 +19,17 @@ jobs:
           gradle-version: 8.6
       - name: Build debug APK
         run: gradle assembleDebug --no-daemon
+      - name: Rename APK
+        run: cp app/build/outputs/apk/debug/app-debug.apk MJUE_YESU.apk
       - uses: actions/upload-artifact@v4
         with:
           name: MJUE_YESU-apk
-          path: app/build/outputs/apk/debug/app-debug.apk
+          path: MJUE_YESU.apk
+      - name: Publish release (kiungo cha kudumu cha APK)
+        continue-on-error: true
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: build-${{ github.run_number }}
+          name: MJUE YESU (build ${{ github.run_number }})
+          files: MJUE_YESU.apk
+          make_latest: true
