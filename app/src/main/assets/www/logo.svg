@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
+  <defs>
+    <linearGradient id="fl" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F6B21C"/><stop offset="1" stop-color="#E4571B"/></linearGradient>
+  </defs>
+  <circle cx="60" cy="60" r="57" fill="#ffffff" stroke="#6B2D9B" stroke-width="4"/>
+  <path d="M60 11C70 25 77 34 73 47C71 54 65 58 60 58C54 58 48 54 47 47C45 39 53 35 55 27C56 23 58 18 60 11Z" fill="url(#fl)"/>
+  <path d="M60 33C64 40 67 44 65 50C64 53 62 55 60 55C58 55 56 53 55 50C54 46 58 43 59 39C59.5 37 59.8 35 60 33Z" fill="#FFE08A"/>
+  <path d="M60 68C49 62 35 61 23 65L23 90C35 86 49 87 60 93Z" fill="#ffffff" stroke="#6B2D9B" stroke-width="3.2" stroke-linejoin="round"/>
+  <path d="M60 68C71 62 85 61 97 65L97 90C85 86 71 87 60 93Z" fill="#ffffff" stroke="#6B2D9B" stroke-width="3.2" stroke-linejoin="round"/>
+  <path d="M60 68L60 93" stroke="#6B2D9B" stroke-width="3.2"/>
+  <path d="M30 73C38 71 46 72 53 75M30 79C38 77 46 78 53 81M67 75C74 72 82 71 90 73M67 81C74 78 82 77 90 79" stroke="#B9A3D1" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <path d="M24 100Q32 94 40 100T56 100T72 100T88 100T96 100" stroke="#1F6FB5" stroke-width="3.2" fill="none" stroke-linecap="round"/>
+  <path d="M30 108Q37 103 44 108T58 108T72 108T86 108" stroke="#1F6FB5" stroke-width="3" fill="none" stroke-linecap="round" opacity=".65"/>
+</svg>

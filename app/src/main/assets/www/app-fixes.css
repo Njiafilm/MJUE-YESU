@@ -1,0 +1,148 @@
+/* MJUE YESU v3.1 — marekebisho ya mwonekano (muundo wa GC, maandishi yanayoonekana, vitufe vya lugha) */
+
+/* ===== 1. Maandishi yaliyokuwa hayaonekani (rangi ya kifuniko cheusi ilirithiwa na kisanduku chepesi) ===== */
+.lesson-memory,
+.lesson-memory p,
+.lesson-memory .ref{color:var(--text,#2a1f3d)!important}
+.lesson-memory .label{color:var(--text,#2a1f3d)!important}
+.lesson-cover .lesson-copy p,
+.lesson-cover .lesson-copy .q,
+.lesson-cover .lesson-copy .key-point{color:var(--text,#2a1f3d)}
+.lesson-cover > p{color:var(--text,#2a1f3d)}
+
+/* ===== 2. Kifuniko cha somo (Q4) — muundo wa GC: ukurasa mweupe, maandishi meusi ===== */
+.lesson-cover.gc-cover{
+  background:var(--paper,#fffcfe)!important;color:var(--text,#2a1f3d)!important;
+  border:1px solid var(--line,#e0d4ef);box-shadow:var(--shadow,0 6px 18px rgba(60,25,5,.10));
+  text-align:left;padding:18px 16px 20px
+}
+.lesson-cover.gc-cover::after{display:none!important}
+.lesson-cover.gc-cover .lesson-page-title{color:var(--brown-dark,#4A1D6E)!important;text-align:left;margin:12px 0 10px}
+.lesson-cover.gc-cover > p{
+  margin:6px 0 14px!important;font-size:15px!important;line-height:1.6;color:var(--text,#2a1f3d)!important;text-align:left
+}
+/* "Somo la Juma Hili:" kama kichwa cha sehemu ("Read for This Week's Study") */
+.lesson-cover.gc-cover > p > b:first-child{display:block;font-size:17px;font-weight:800;margin-bottom:4px;color:var(--text,#2a1f3d)}
+
+/* ===== 3. Fungu la kukariri — muundo wa GC (mstari wa kushoto, bila kisanduku) ===== */
+.lesson-memory,
+.memory-verse.lesson-memory,
+.lesson-cover .lesson-memory{
+  background:transparent!important;border:0!important;border-radius:0!important;box-shadow:none!important;
+  border-left:4px solid var(--gc-bar,#1f2a44)!important;
+  padding:2px 0 2px 14px!important;margin:16px 0!important;text-align:left
+}
+[data-theme="dark"] .lesson-memory{--gc-bar:#d9c7a3}
+.lesson-memory .label{
+  display:block;font-size:16px!important;font-weight:800!important;letter-spacing:0!important;
+  text-transform:lowercase;margin:0 0 6px!important
+}
+.lesson-memory .label::first-letter{text-transform:uppercase}
+.lesson-memory .label::after{content:":"}
+.lesson-memory p{
+  display:inline;font-style:normal!important;font-family:Georgia,serif;font-size:16.5px!important;line-height:1.65!important;margin:0!important
+}
+.lesson-memory .ref{display:inline;font-size:16px!important;font-weight:400!important;margin:0!important}
+.lesson-memory .ref::before{content:" ("}
+.lesson-memory .ref::after{content:")"}
+
+/* ===== 4. Viungo vya mafungu: mstari chini (kama programu ya GC) badala ya vitufe ===== */
+.ref-link{
+  color:inherit!important;font-weight:inherit!important;
+  text-decoration:underline!important;text-decoration-style:solid!important;text-decoration-thickness:1px;text-underline-offset:3px;
+  white-space:normal!important;cursor:pointer
+}
+/* Vitufe vya mafungu (kiputo cha zambarau chenye 📖) vimeondolewa */
+.lesson-reader-body .pass-row,
+.lesson-reader-body .lesson-refbox{display:none!important}
+/* "Usomaji: Zaburi NN" kwenye kichwa cha siku — maandishi yenye mstari, si kitufe */
+.lesson-day-banner .pass-btn{
+  display:inline!important;background:transparent!important;box-shadow:none!important;border:0!important;
+  padding:0!important;margin:2px 0 0!important;font-size:12px!important;font-weight:700!important;
+  color:#fff!important;text-decoration:underline;text-underline-offset:3px;border-radius:0!important;cursor:pointer
+}
+.lesson-day-banner .pass-btn::before{content:""!important}
+/* Mstari wa mafungu wa siku (unaobadilisha safu ya vitufe pale mafungu hayamo kwenye maandishi) */
+.gc-refline{margin:10px 0 12px;font-size:15px;line-height:1.7;color:var(--text,#2a1f3d)}
+.gc-refline b{font-weight:800}
+
+/* ===== 5. Maudhui ya admin: kichwa chenye vitufe vya lugha (Kiswahili / English) ===== */
+.pab-head{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.pab-tag{font-size:11px;font-weight:800;color:#6B2D9B;letter-spacing:.5px}
+.lang-pills{display:inline-flex;border:1px solid #6B2D9B;border-radius:999px;overflow:hidden}
+.lang-pills button{
+  border:0;background:transparent;color:#6B2D9B;font-size:12px;font-weight:800;padding:5px 12px;cursor:pointer
+}
+.lang-pills button.on{background:#6B2D9B;color:#fff}
+.public-admin-block .pdf-link{
+  display:inline-block;margin:6px 0;padding:9px 14px;border-radius:12px;background:#6B2D9B;color:#fff!important;
+  font-weight:700;text-decoration:none
+}
+.admin-lang-note{font-size:11px;color:var(--muted,#6b5b7a);margin:4px 0 0}
+#adminPdfName button{margin-left:8px;border:1px solid #b33;background:#fff;color:#b33;border-radius:8px;font-size:12px;padding:3px 8px}
+
+/* ===== 6. Hali ya upakiaji na vitufe vya njia mbadala (dashboard) ===== */
+.admin-status{margin:6px 0 4px;font-size:13px;font-weight:700;color:var(--brown-dark,#4A1D6E);min-height:1.2em;line-height:1.4}
+.alt-pick{margin:6px 0 2px}
+.alt-pick[hidden]{display:none!important}
+
+/* ===== 7. Kichwa cha siku: mpangilio mzuri na kinahaririwa ===== */
+.lesson-day-banner{padding:14px 16px!important;align-items:center!important;gap:10px}
+.lesson-day-banner .day-meta{line-height:1.55!important;text-align:right;font-size:12.5px!important}
+.lesson-day-banner .day-read{display:inline-block;font-weight:700;margin-top:2px}
+.lesson-day-banner .ref-link{color:#fff!important;font-weight:700}
+.lesson-reader-body.editing .lesson-day-banner .day-meta[contenteditable]{
+  outline:2px dashed rgba(255,255,255,.9);outline-offset:3px;border-radius:6px;padding:3px 8px;min-width:96px;background:rgba(255,255,255,.12)
+}
+
+/* ===== 8. Neno la Leo (fungu la juma + usomaji wa siku) na karatasi ya usomaji ===== */
+.daily-card .daily-ref .ref-link,.daily-card .daily-read .ref-link{color:#fff!important}
+.daily-read{margin:12px 0 4px;font-size:14px;line-height:1.7;color:#fff;opacity:.96}
+.daily-read b{font-weight:800}
+#cloudTiles button[data-act="daily"] small{display:block;font-size:11px;font-weight:700;opacity:.8;margin-top:2px}
+#readSheet{position:fixed;inset:0;z-index:1440;display:none}
+#readSheet.open{display:block}
+#readSheet .rs-back{position:absolute;inset:0;background:rgba(0,0,0,.45)}
+#readSheet .rs-box{position:absolute;left:0;right:0;bottom:0;max-height:80vh;display:flex;flex-direction:column;background:var(--paper,#fff);color:var(--text,#222);border-radius:20px 20px 0 0;box-shadow:0 -10px 30px rgba(0,0,0,.28);padding-bottom:env(safe-area-inset-bottom,0)}
+#readSheet .rs-grab{width:42px;height:4px;border-radius:4px;background:var(--line,#ccc);margin:8px auto 2px}
+#readSheet .rs-head{display:flex;align-items:center;gap:10px;padding:8px 16px 10px;border-bottom:1px solid var(--line,#ddd)}
+#readSheet .rs-title{flex:1;font-family:Georgia,serif;font-weight:800;font-size:18px;color:var(--brown-dark,#4A1D6E)}
+#readSheet .rs-x{border:0;background:transparent;font-size:26px;line-height:1;color:var(--muted,#777);cursor:pointer;padding:0 4px}
+#readSheet .rs-body{padding:12px 18px 18px;overflow:auto;-webkit-overflow-scrolling:touch}
+#readSheet .rs-date{font-size:13px;color:var(--muted,#6b5b7a);margin-bottom:6px}
+#readSheet h4{margin:14px 0 6px;font-size:15px;color:var(--brown-dark,#4A1D6E)}
+#readSheet blockquote{margin:0;padding:2px 0 2px 14px;border-left:4px solid var(--gc-bar,#1f2a44);font-family:Georgia,serif;font-size:16.5px;line-height:1.65}
+#readSheet .rs-reads{font-size:15.5px;line-height:1.8}
+#readSheet .rs-open{width:100%;margin-top:16px;border:0;border-radius:14px;padding:13px 16px;background:#6B2D9B;color:#fff;font-weight:800;font-size:15px;cursor:pointer}
+
+/* ===== 9. Kadi za Lesoni: ratiba, robo nzima, uhariri ===== */
+.schedule .gc-refline{margin:4px 0 0;font-size:13.5px;line-height:1.6}
+.week-refs{margin:2px 0 10px}
+.robo-row{padding:5px 0;font-size:13.5px;line-height:1.5;cursor:pointer}
+.robo-row.cur{font-weight:800;color:var(--brown-dark,#4A1D6E)}
+.robo-row.past{opacity:.6}
+#quarterRoll{margin-top:10px;font-size:13px;line-height:1.55;background:rgba(255,255,255,.14);border-radius:10px;padding:8px 10px}
+#quarterRoll .rq-link{color:#fff;font-weight:800;text-decoration:underline}
+#homeEditBtn{position:absolute;top:10px;right:10px;border:0;border-radius:999px;padding:6px 12px;background:rgba(255,255,255,.9);color:#4A1D6E;font-weight:800;font-size:12.5px;cursor:pointer}
+#homeEditBtn[hidden],#homeEditBar[hidden]{display:none!important}
+#homeEditBar{position:fixed;left:10px;right:10px;bottom:76px;z-index:1300;display:flex;gap:8px;align-items:center;background:#241d33;color:#fff;border-radius:14px;padding:9px 12px;font-size:13px;box-shadow:0 8px 22px rgba(0,0,0,.35)}
+#homeEditBar span{flex:1}
+#homeEditBar button{border:0;border-radius:10px;padding:7px 11px;font-weight:700;font-size:12.5px;background:#4a3f63;color:#fff;cursor:pointer}
+#homeEditBar button.pri{background:#6B2D9B}
+#lesoni.home-editing [contenteditable]{outline:2px dashed #6B2D9B;outline-offset:3px;border-radius:6px;background:rgba(107,45,155,.07)}
+
+/* ===== 10. Maneno ya nyimbo: mandhari ya kuvutia isiyochosha macho ===== */
+.lyrics-sheet{background:linear-gradient(180deg,#f4eefc 0%,#fbf5ec 60%,#f3eee6 100%)!important}
+.lyrics-body{background:transparent!important;padding:18px 16px 110px!important}
+.lyrics-body .verse{
+  background:rgba(255,255,255,.8);border:1px solid rgba(107,45,155,.12);border-radius:16px;
+  padding:13px 15px;margin:0 0 14px;box-shadow:0 3px 12px rgba(80,50,120,.07);line-height:1.75;font-size:1.06rem;color:#2d2540
+}
+.lyrics-body .verse .vnum{background:rgba(107,45,155,.12);color:#5b2a8a;margin-bottom:6px}
+.lyrics-body .verse p{margin:0}
+.lyrics-body .verse.chorus{background:rgba(255,244,215,.9);border:1px solid rgba(201,150,43,.3);border-left:5px solid #c9962b}
+.lyrics-body .verse.chorus .vnum{background:rgba(201,150,43,.2);color:#8a5d0c}
+[data-theme="dark"] .lyrics-sheet{background:linear-gradient(180deg,#1f1a2c 0%,#241d2b 60%,#1c1921 100%)!important}
+[data-theme="dark"] .lyrics-body .verse{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.1);color:#efe6dc;box-shadow:none}
+[data-theme="dark"] .lyrics-body .verse .vnum{background:rgba(255,255,255,.12);color:#e6d8f5}
+[data-theme="dark"] .lyrics-body .verse.chorus{background:rgba(224,192,96,.12);border-color:rgba(224,192,96,.3);border-left-color:#e0c060}
