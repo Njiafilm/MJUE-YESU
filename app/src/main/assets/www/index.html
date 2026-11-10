@@ -1012,6 +1012,8 @@ h2 {
 <style id="standalone-build-note">
 /* Standalone build: no dependency on NjiaMauzo-Afrika. */
 </style>
+<script src="quarters.js"></script>
+<script src="bible-find.js"></script>
 </head>
 <body>
 <div class="app">
@@ -1179,7 +1181,6 @@ h2 {
           <button type="button" class="quarter-btn" data-quarter="q2">Q2 2026<br><small>Masomo ya robo</small></button>
         </div>
         <div id="otherLessonChoices" class="other-lesson-choices" hidden>
-          <div class="lesson-extra-note">Chagua robo hapo juu. Q4 2026 ndiyo robo ya sasa (kuanzia Sept 26).</div>
         </div>
       </div>
 
@@ -1275,10 +1276,6 @@ h2 {
           11. Udhihirisho wa Kinabii nyakati muhimu<br>
           12. Ufunuo wa Kinabii wa mwisho<br>
           13. Baraka kutoka Neno la Kinabii
-        </p>
-        <p style="margin-top:12px;font-size:12px;color:var(--muted)">
-          Chanzo: <b>General Conference of SDA</b> · Adult Bible Study Guide · Q4 2026 “The Gift of Prophecy”.
-          Q3 (1 &amp; 2 Wakorintho) bado inapatikana kupitia kichupo cha robo.
         </p>
       </div>
     </section>
@@ -1629,7 +1626,7 @@ h2 {
     <div id="adminPreviewBox" style="display:none;margin-top:12px;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--soft);max-height:240px;overflow:auto;font-size:13px"></div>
   </div>
 </div>
-<div class="footer-note">MJUE YESU · Toleo 3.6</div>
+<div class="footer-note">MJUE YESU · Toleo 4.0</div>
 </div>
 
 
@@ -2609,11 +2606,7 @@ document.getElementById('home').classList.add('active');
           <p>Kama tutakavyojifunza kila ijumaa katika majuma yanayokuja, Ellen White alimpenda sana Yesu na akamtumikia katika maisha yake yote.</p>
           <p class="q">Azimio: Wiki hii nitasoma Neno kila siku na kuomba Mungu anizungumzie kupitia Biblia.</p>
         </div>
-      </article>
-
-      <section class="lesson-further" style="margin:16px;padding:14px;background:var(--soft);border-radius:12px;font-size:13px;color:var(--muted)">
-        <b>Chanzo:</b> Adult Bible Study Guide · Q4 2026 “The Gift of Prophecy” · General Conference of Seventh-day Adventists. Maudhui yametafsiriwa/kufupishwa kwa matumizi ya offline.
-      </section>`;
+      </article>`;
     }
 
     // Lesoni 2–13 — mada rasmi, mafungu ya juma, aya fupi kila siku
@@ -2809,10 +2802,7 @@ document.getElementById('home').classList.add('active');
           <p class="q">*Jifunze somo la juma hili kwa maandalizi ya Sabato ijayo.</p>
         </div>
       </section>
-      ${daysHtml}
-      <section class="lesson-further" style="margin:16px;padding:14px;background:var(--soft);border-radius:12px;font-size:13px;color:var(--muted)">
-        <b>Chanzo:</b> Adult Bible Study Guide · Q4 2026 “The Gift of Prophecy” · GC SDA. Mada na mafungu ni rasmi; aya ni muhtasari wa maana kwa matumizi ya offline.
-      </section>`;
+      ${daysHtml}`;
   }
 
 
@@ -2822,6 +2812,21 @@ document.getElementById('home').classList.add('active');
     if(!r||!body)return;
     // Support "q4-1" keys and plain numbers (Q3)
     let key=String(num);
+    if(window.MJUE_Q && !window.MJUE_Q.isLegacy(key)){
+      const L=window.MJUE_Q.lookup(key);
+      if(L){
+        document.getElementById('lessonReaderTitle').textContent=`Lesoni ${L.n} — ${L.q.titles[L.n]||''}`;
+        const sm=r.querySelector('.lesson-reader-title small');
+        if(sm) sm.textContent=L.q.label+' · '+L.q.title;
+        body.innerHTML=window.MJUE_Q.template(L.q,L.n);
+        r.classList.add('show');
+        r.setAttribute('aria-hidden','false');
+        document.body.style.overflow='hidden';
+        bindLessonBibleButtons(body);
+        body.scrollTop=0;
+        return;
+      }
+    }
     if(key.startsWith('q4-')){
       const n=Number(key.replace('q4-',''));
       document.getElementById('lessonReaderTitle').textContent=`Lesoni ${n} — ${q4Titles[n]||''}`;
@@ -2836,6 +2841,7 @@ document.getElementById('home').classList.add('active');
       return;
     }
     document.getElementById('lessonReaderTitle').textContent=`Lesoni ${num} — ${lessonData[num]||''}`;
+    {const sm3=r.querySelector('.lesson-reader-title small'); if(sm3) sm3.textContent='Q3 2026 · 1 & 2 Wakorintho';}
     body.innerHTML=lessonContent[num]||futureTemplate(num);
     r.classList.add('show');
     r.setAttribute('aria-hidden','false');
@@ -2845,7 +2851,12 @@ document.getElementById('home').classList.add('active');
     body.scrollTop=0;
   }
   window.mjueOpenLesson=openLesson;
-  window.__q4Titles=q4Titles; window.__q4Memory=q4Memory; window.__q4Dates=q4Dates; window.__q4Template=q4Template;
+  /* Mfumo wa robo: __q4* sasa inarejelea ROBO YA SASA (Q4 2026, Q1 2027, ...) — angalia quarters.js */
+  if(window.MJUE_Q) window.MJUE_Q.setLegacyQ4({titles:q4Titles,memory:q4Memory,dates:q4Dates});
+  [['__q4Titles','titles',q4Titles],['__q4Memory','memory',q4Memory],['__q4Dates','dates',q4Dates]].forEach(function(a){
+    Object.defineProperty(window,a[0],{configurable:true,get:function(){var A=window.MJUE_Q&&window.MJUE_Q.active();return (A&&A.hasData&&A[a[1]])||a[2];}});
+  });
+  window.__q4Template=function(n){var A=window.MJUE_Q&&window.MJUE_Q.active();return (!A||A.legacy==='q4')?q4Template(n):window.MJUE_Q.template(A,n);};
   function closeLesson(){const r=document.getElementById('lessonReader');if(r){r.classList.remove('show');r.setAttribute('aria-hidden','true')}document.body.style.overflow='';}
   document.querySelectorAll('[data-open-lesson]').forEach(b=>b.addEventListener('click',()=>openLesson(b.dataset.openLesson)));
 
@@ -3945,8 +3956,9 @@ if ('serviceWorker' in navigator) {
 (function(){
   var MONTHS=['Januari','Februari','Machi','Aprili','Mei','Juni','Julai','Agosti','Septemba','Oktoba','Novemba','Desemba'];
   var DAYS=['Sabato Mchana','Jumapili','Jumatatu','Jumanne','Jumatano','Alhamisi','Ijumaa'];
-  var BASE=new Date(2026,8,26); // Lesoni 1 inaanza Sabato Sept 26, 2026
-  function startOf(n){var d=new Date(BASE.getFullYear(),BASE.getMonth(),BASE.getDate()+7*(n-1));return d;}
+  function startOf(n){var B=window.MJUE_Q?window.MJUE_Q.start():new Date(2026,8,26);return new Date(B.getFullYear(),B.getMonth(),B.getDate()+7*(n-1));} // Lesoni 1 ya robo ya sasa
+  function isQ4(){var A=window.MJUE_Q&&window.MJUE_Q.active();return !A||A.legacy==='q4';}
+  function qKey(n){return window.MJUE_Q?window.MJUE_Q.key(n):'q4-'+n;}
   function dateOf(n,i){var s=startOf(n);return new Date(s.getFullYear(),s.getMonth(),s.getDate()+i);}
   function fmt(d){return d.getDate()+' '+MONTHS[d.getMonth()];}
   function today(){var t=new Date();return new Date(t.getFullYear(),t.getMonth(),t.getDate());}
@@ -3966,7 +3978,7 @@ if ('serviceWorker' in navigator) {
     if(!r||!body||!r.classList.contains('show')) return;
     var title=(document.getElementById('lessonReaderTitle')||{}).textContent||'';
     var small=r.querySelector('.lesson-reader-title small');
-    if(!/Q4/.test((small&&small.textContent)||'')) return;
+    if(!window.MJUE_Q || ((small&&small.textContent)||'').indexOf(window.MJUE_Q.label())!==0) return;
     var m=title.match(/Lesoni\s*(\d+)/i); if(!m) return;
     var n=+m[1];
     var pages=body.querySelectorAll('.lesson-page');
@@ -4004,7 +4016,7 @@ if ('serviceWorker' in navigator) {
   /* ---------- Ukurasa wa nyumbani / Lesoni ---------- */
   function setText(el,t){if(el) el.textContent=t;}
   function updateHome(){
-    var n=shownLesson(), key='q4-'+n;
+    var n=shownLesson(), key=qKey(n), q4L1=(isQ4()&&n===1), yr=startOf(n).getFullYear(), qlab=window.MJUE_Q?window.MJUE_Q.label():'Q4 2026';
     var titles=window.__q4Titles||{}, mem=(window.__q4Memory||{})[n], dates=(window.__q4Dates||{})[n]||'';
     var title=titles[n]||('Lesoni '+n);
 
@@ -4019,22 +4031,22 @@ if ('serviceWorker' in navigator) {
     if(sb){
       setText(sb.querySelector('h3'),'Utangulizi wa Juma — Lesoni '+n);
       var ps=sb.querySelectorAll('p');
-      if(n!==1){
+      if(!q4L1){
         if(ps[0]) ps[0].textContent='Soma mada ya juma, tafakari ujumbe mkuu, kisha fungua fungu la Biblia.';
         var ol=sb.querySelector('ol'); if(ol) ol.style.display='none';
       }
       if(ps[1]) ps[1].innerHTML='<b>Mada:</b> '+title;
       if(ps[2]&&mem) ps[2].innerHTML='<b>Fungu la kukariri:</b> '+mem.ref;
-      if(ps[3]) ps[3].innerHTML='Wiki: <b>'+dates+', 2026</b> · Q4 2026';
+      if(ps[3]) ps[3].innerHTML='Wiki: <b>'+dates+', '+yr+'</b> · '+qlab;
       var cta=sb.querySelector('.lesson-cta'); if(cta) cta.textContent='📖 Fungua Lesoni '+n+' — siku ya leo';
     }
 
     // Kadi ya somo la sasa
     var card=document.getElementById('currentLessonCard');
     if(card){
-      setText(card.querySelector('.badge'),'Lesoni '+n+' · '+dates+', 2026');
+      setText(card.querySelector('.badge'),'Lesoni '+n+' · '+dates+', '+yr);
       setText(card.querySelector('h3'),title);
-      if(n!==1){
+      if(!q4L1){
         var d=card.querySelector('h3 + p'); if(d) d.style.display='none';
         var mp=card.querySelectorAll('.pass-row');
         if(mp[0]&&mem){mp[0].innerHTML='<button type="button" class="pass-btn" data-pass="'+mem.pass+'">📖 '+mem.ref+'</button>';}
@@ -4082,7 +4094,7 @@ if ('serviceWorker' in navigator) {
     if(!li||e.target.closest('[data-pass]')) return;
     window.__mjueTargetDay=+li.getAttribute('data-day-open');
     var f=window.mjueOpenLesson||window.openLesson;
-    if(typeof f==='function') f('q4-'+shownLesson());
+    if(typeof f==='function') f(qKey(shownLesson()));
   },true);
 
   function init(){try{updateHome();}catch(err){console.error('mjue-today',err);}}
@@ -4379,7 +4391,9 @@ if ('serviceWorker' in navigator) {
     var t=(document.getElementById('lessonReaderTitle')||{}).textContent||'';
     var sm=(reader.querySelector('.lesson-reader-title small')||{}).textContent||'';
     var m=t.match(/Lesoni\s*(\d+)/i); if(!m) return null;
-    return (/Q4/.test(sm)?'q4':'q3')+'-'+m[1];
+    var qk='q3';
+    try{var QL=window.MJUE_Q.list();for(var qi=0;qi<QL.length;qi++){if(QL[qi].hasData&&sm.indexOf(QL[qi].label)===0){qk=QL[qi].legacy==='q3'?'q3':(QL[qi].legacy==='q4'?'q4':QL[qi].key);break;}}}catch(e){}
+    return qk+'-'+m[1];
   }
   /* Orodha ya zamani (SEL) inabaki mwanzoni ili mabadiliko yaliyohifadhiwa yasihame; sehemu nyingine zote za maandishi zinaongezwa mwishoni */
   var SEL_X='h1,h2,h3,h4,h5,p,li,blockquote,td,th,figcaption,.soma-label,.soma-text,.day-name,.key-point,.q,.lesson-cover-badge,.lesson-further,.lesson-memory,.lesson-reflection,.lesson-discuss';
@@ -4483,6 +4497,7 @@ if ('serviceWorker' in navigator) {
 <script src="cloud-config.js"></script>
 <script src="cloud.js"></script>
 <script src="cloud-ui.js"></script>
+<script src="app-update.js"></script>
 <script src="app-fixes.js"></script>
 </body>
 </html>

@@ -360,12 +360,16 @@
 (function(){
   'use strict';
   function toast(t){ if(window.MJUE_GC && window.MJUE_GC.toast) window.MJUE_GC.toast(t); }
-  var BASE = new Date(2026, 8, 26); // Lesoni 1 ya Q4 2026 inaanza Sabato, Septemba 26, 2026
+  function qBase(){ return window.MJUE_Q ? window.MJUE_Q.start() : new Date(2026, 8, 26); } // Lesoni 1 ya robo ya sasa
+  function isQ4(){ var A = window.MJUE_Q && window.MJUE_Q.active(); return !A || A.legacy === 'q4'; }
+  function qKey(n){ return window.MJUE_Q ? window.MJUE_Q.key(n) : 'q4-' + n; }
+  function qHome(){ var A = window.MJUE_Q && window.MJUE_Q.active(); return (!A || A.legacy === 'q4') ? 'q4' : A.key; }
+  function qLab(){ return window.MJUE_Q ? window.MJUE_Q.label() : 'Q4 2026'; }
   var DN = ['Sabato', 'Jumapili', 'Jumatatu', 'Jumanne', 'Jumatano', 'Alhamisi', 'Ijumaa'];
   var WD = ['Jumapili', 'Jumatatu', 'Jumanne', 'Jumatano', 'Alhamisi', 'Ijumaa', 'Jumamosi'];
   var MN = ['Januari', 'Februari', 'Machi', 'Aprili', 'Mei', 'Juni', 'Julai', 'Agosti', 'Septemba', 'Oktoba', 'Novemba', 'Desemba'];
   function $(id){ return document.getElementById(id); }
-  function dstart(n){ return new Date(BASE.getFullYear(), BASE.getMonth(), BASE.getDate() + 7 * (n - 1)); }
+  function dstart(n){ var B = qBase(); return new Date(B.getFullYear(), B.getMonth(), B.getDate() + 7 * (n - 1)); }
   function ddate(n, i){ var s = dstart(n); return new Date(s.getFullYear(), s.getMonth(), s.getDate() + i); }
   function today(){ var t = new Date(); return new Date(t.getFullYear(), t.getMonth(), t.getDate()); }
   function diff(a, b){ return Math.round((a - b) / 86400000); }
@@ -478,7 +482,7 @@
       closeRS();
       if(st.st === 'during') window.__mjueTargetDay = st.i;
       var f = window.mjueOpenLesson || window.openLesson;
-      if(typeof f === 'function') f('q4-' + st.n);
+      if(typeof f === 'function') f(qKey(st.n));
     });
     b.appendChild(go);
     rs.classList.add('open');
@@ -513,7 +517,7 @@
     });
     return d.innerHTML;
   }
-  function skey(n){ return 'mjue_edit_home-q4-' + n; }
+  function skey(n){ return 'mjue_edit_home-' + qHome() + '-' + n; }
   function loadSaved(n){ try{ return JSON.parse(localStorage.getItem(skey(n)) || '{}') || {}; }catch(e){ return {}; } }
   function applyEdits(n){
     var saved = loadSaved(n), list = eds();
@@ -539,14 +543,14 @@
       var list = eds(), saved = loadSaved(n), changed = 0;
       list.forEach(function(el, i){ var h = cleanHtml(el.innerHTML); if(h !== snap[i]){ saved[i] = h; changed++; } });
       try{ if(Object.keys(saved).length) localStorage.setItem(skey(n), JSON.stringify(saved)); else localStorage.removeItem(skey(n)); }catch(x){}
-      if(window.mjueCloudLessonEdit) window.mjueCloudLessonEdit('home-q4-' + n, Object.keys(saved).length ? saved : null);
+      if(window.mjueCloudLessonEdit) window.mjueCloudLessonEdit('home-' + qHome() + '-' + n, Object.keys(saved).length ? saved : null);
       setEditing(false); refreshWeek(); toast(changed ? 'Imehifadhiwa' : 'Hakuna mabadiliko');
     } else if(a === 'cancel'){
       setEditing(false); refreshWeek();
     } else if(a === 'reset'){
       if(!confirm('Rudisha maandishi ya asili ya kadi hizi?')) return;
       try{ localStorage.removeItem(skey(n)); }catch(x){}
-      if(window.mjueCloudLessonEdit) window.mjueCloudLessonEdit('home-q4-' + n, null);
+      if(window.mjueCloudLessonEdit) window.mjueCloudLessonEdit('home-' + qHome() + '-' + n, null);
       setEditing(false); refreshWeek(); toast('Yamerudishwa');
     }
   });
@@ -566,7 +570,7 @@
     var st = state(), n = st.n, wk = parseWeek(n);
     var titles = window.__q4Titles || {}, dates = window.__q4Dates || {}, mem = (window.__q4Memory || {})[n];
     var td = today();
-    var Q = (window.MJUE_EXTRAS && window.MJUE_EXTRAS.questions) || {};
+    var Q = (isQ4() && window.MJUE_EXTRAS && window.MJUE_EXTRAS.questions) || {};
     try{ if(window.MJUE_TODAY && window.MJUE_TODAY.refresh) window.MJUE_TODAY.refresh(); }catch(e){}
 
     // Tarehe ya leo kichwani
@@ -575,7 +579,7 @@
     // Kitufe kikubwa cha "Fungua somo la leo"
     var tb = $('todayLessonBtn');
     if(tb){
-      tb.setAttribute('data-open-lesson', 'q4-' + n);
+      tb.setAttribute('data-open-lesson', qKey(n));
       var tsm = tb.querySelector('small');
       if(tsm) tsm.textContent = 'Lesoni ' + n + ' \u00B7 ' + (st.st === 'during' ? (st.i === 0 ? 'Sabato' : DN[st.i]) + ', ' + shortDate(td) : (titles[n] || ''));
     }
@@ -587,6 +591,7 @@
       if(window.MJUE_CLOUD && window.MJUE_CLOUD.setDailyDefault) window.MJUE_CLOUD.setDailyDefault(text, mem.ref);
       else { dt.textContent = text; dr.textContent = mem.ref; }
       if(dl) dl.textContent = 'NENO LA LEO \u00B7 FUNGU LA KUKARIRI (JUMA ' + n + ')';
+      if(window.MJUE_Q && window.MJUE_Q.homeHeading) window.MJUE_Q.homeHeading(n);
     }
     // Usomaji wa Biblia wa siku
     var reads = readsFor(st, wk);
@@ -642,7 +647,7 @@
     // Sala ya Somo
     var pc = findCard(/Sala ya Somo/);
     if(pc){
-      var pp = pc.querySelector('p'); if(pp){ pp.classList.add('prayer-text');         if(n !== 1) pp.textContent = '\u201CBwana wangu, asante kwa Neno lako. Nisaidie nijifunze \u201C' + (titles[n] || ('Lesoni ' + n)) + '\u201D wiki hii, nisikie sauti yako, na nitende kulingana na uliyosema. Katika jina la Yesu, Amina.\u201D';
+      var pp = pc.querySelector('p'); if(pp){ pp.classList.add('prayer-text');         if(!(isQ4() && n === 1)) pp.textContent = '\u201CBwana wangu, asante kwa Neno lako. Nisaidie nijifunze \u201C' + (titles[n] || ('Lesoni ' + n)) + '\u201D wiki hii, nisikie sauti yako, na nitende kulingana na uliyosema. Katika jina la Yesu, Amina.\u201D';
       }
     }
     // Kidokezo cha leo
@@ -658,7 +663,7 @@
     // Robo nzima: alama ya "Wiki hii" inafuata tarehe
     var rc = findCard(/Robo nzima/);
     if(rc){
-      var rh = rc.querySelector('h3'); if(rh) rh.textContent = 'Robo nzima \u00B7 Q4 2026';
+      var rh = rc.querySelector('h3'); if(rh) rh.textContent = 'Robo nzima \u00B7 ' + qLab();
       var pl = rc.querySelectorAll('p')[0];
       if(pl){
         pl.innerHTML = '';
@@ -681,7 +686,7 @@
       qr.textContent = '';
       if(st.st === 'after'){
         var nx = ddate(14, 0), nq = qLabel(new Date(nx.getFullYear(), nx.getMonth(), nx.getDate() + 6));
-        qr.appendChild(document.createTextNode('\u2705 Robo ya Q4 2026 imekamilika. Robo mpya (' + nq + ') inaanza ' + longDate(nx) + '. Masomo ya robo hiyo yakipatikana yatawekwa hapa. Kwa sasa masomo ya GC: '));
+        qr.appendChild(document.createTextNode('\u2705 Robo ya ' + qLab() + ' imekamilika. Robo mpya (' + nq + ') inaanza ' + longDate(nx) + '. Masomo ya robo hiyo yakipatikana yatawekwa hapa. Kwa sasa masomo ya GC: '));
         var gl = document.createElement('a'); gl.className = 'rq-link'; gl.href = '#'; gl.textContent = 'ssnet.org';
         gl.addEventListener('click', function(ev){ ev.preventDefault(); window.open('https://ssnet.org/study-guides/'); });
         qr.appendChild(gl);
@@ -698,7 +703,7 @@
     var r = e.target.closest && e.target.closest('[data-robo]');
     if(!r || editing) return;
     var f = window.mjueOpenLesson || window.openLesson;
-    if(typeof f === 'function') f('q4-' + r.getAttribute('data-robo'));
+    if(typeof f === 'function') f(qKey(r.getAttribute('data-robo')));
   });
 
   var lastDay = '';

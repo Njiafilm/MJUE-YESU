@@ -35,6 +35,3 @@ cd ~/storage/downloads/MJUE_YESU_Android
 bash termux_build.sh
 ```
 APK itakuwa: Downloads/MJUE_YESU.apk
-
-## Toleo 3.0 — Cloud (admin → watumiaji wote)
-Soma **SETUP_CLOUD.md** (dakika ~10, mara moja). Bila kujaza `www/cloud-config.js`, app inafanya kazi offline kama zamani.

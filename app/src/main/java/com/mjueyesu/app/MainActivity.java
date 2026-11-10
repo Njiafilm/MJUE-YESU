@@ -57,6 +57,26 @@ public class MainActivity extends AppCompatActivity {
      * kwenye file:// na kuruhusu tu seva za Firebase/Google zilizoorodheshwa.
      */
     private class NativeNet {
+        /** Kikumbusho cha kila siku cha fungu la kukariri. Hurudisha "ok" au "denied" (ruhusa ya arifa). */
+        @JavascriptInterface
+        public String setDailyReminder(final boolean on, final int hour, final int minute, final String payloadJson) {
+            try {
+                DailyReminder.apply(getApplicationContext(), on, hour, minute, payloadJson);
+                if (on && android.os.Build.VERSION.SDK_INT >= 33
+                        && checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) != android.content.pm.PackageManager.PERMISSION_GRANTED) {
+                    runOnUiThread(new Runnable() {
+                        @Override public void run() {
+                            requestPermissions(new String[]{android.Manifest.permission.POST_NOTIFICATIONS}, 7002);
+                        }
+                    });
+                    return "denied";
+                }
+                return "ok";
+            } catch (Exception e) {
+                return "error";
+            }
+        }
+
         @JavascriptInterface
         public boolean openExternal(final String url) {
             try {
@@ -318,6 +338,14 @@ public class MainActivity extends AppCompatActivity {
                     } catch (Exception ignored) {}
                 }
             });
+        }
+
+        /** Namba ya toleo (versionCode) la app iliyosakinishwa — kwa ukaguzi wa sasisho. */
+        @JavascriptInterface
+        public int appVersionCode() {
+            try {
+                return (int) getPackageManager().getPackageInfo(getPackageName(), 0).versionCode;
+            } catch (Exception e) { return 0; }
         }
 
         /** Fungua kiungo cha http(s) kwenye kivinjari cha simu. */
