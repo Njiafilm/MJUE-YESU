@@ -313,6 +313,7 @@ st.textContent=
 '#chapFab{position:fixed;right:25px;bottom:82px;width:64px;height:64px;border:0;border-radius:24px;background:#a07850;color:#fff;font-size:34px;line-height:1;box-shadow:0 5px 14px rgba(70,48,28,.3);z-index:1650;cursor:pointer;display:none}'+
 '#chapFab.show{display:block}'+
 '#readerFloat{display:none!important}'+
+'#offlineBibleReady,#bibleReader #offlineVerses ~ .notice{display:none!important}'+
 '#bibleReader .bible-reader-top,#bibleReader .reader-actions,#bibleReader #findBar{display:none!important}'+
 '#bfBar{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:12px;padding:max(10px,env(safe-area-inset-top)) 14px 10px;background:var(--paper,#fdfbff);border-bottom:1px solid var(--line,#e3dcee)}'+
 '#bfBack{flex:none;width:44px;height:44px;border-radius:50%;border:0;background:#ecdac4;color:#2b1d10;font-size:24px;cursor:pointer}'+
@@ -408,4 +409,30 @@ setInterval(function(){
   fab.classList.toggle('show',show&&!ov.classList.contains('open'));
 },400);
 }
+
+/* ---------- API kwa mifumo mingine (robo za masomo, admin) ---------- */
+function balanceQuotes(x){
+  var c=function(ch){return x.split(ch).length-1;};
+  if(c('“')<c('”')) x=x.replace(/”\s*$/,'');
+  if(c('“')>c('”')) x=x.replace(/^“/,'');
+  if(c('‘')<c('’')) x=x.replace(/’\s*$/,'');
+  return x;
+}
+window.MJUE_BIBLE_API={
+  ready:function(){ return books().length>0 && !!(window.MJUE_YESU_TRANSLATIONS||window.MJUE_YESU_BIBLE_DATA); },
+  books:function(){ return books().map(function(b){return {name:b.name,code:b.code,ch:b.ch};}); },
+  /* "Ufunuo 12:11-12" / "Waefeso 2:17, 19" -> {ref,pass,text} (maandishi kutoka Biblia ya Neno) */
+  resolve:function(s){
+    var m=String(s||'').trim().match(/^(\d?\s*[^\d:.,\-–]+?)\s+(\d+)\s*[:.,]\s*(.+)$/);
+    if(!m) return null;
+    var pr=parseRef(m[1]+' '+m[2]); if(!pr) return null;
+    var vs=[], segs=m[3].split(/\s*[,;]\s*/);
+    segs.forEach(function(sg){var r=sg.match(/^(\d+)(?:\s*[-–]\s*(\d+))?$/); if(!r) return; var a=+r[1], b=r[2]?+r[2]:a; for(var v=a;v<=b&&v<a+60;v++) vs.push(v);});
+    if(!vs.length) return null;
+    var D=(window.MJUE_YESU_TRANSLATIONS&&window.MJUE_YESU_TRANSLATIONS.NENO)||data();
+    var cp=(D[pr.book.code]||{})[String(pr.ch)]||{};
+    var text=vs.map(function(v){return cp[String(v)];}).filter(Boolean).join(' ');
+    return {ref:pr.book.name+' '+pr.ch+':'+m[3].replace(/\s*[-–]\s*/g,'-'),pass:pr.book.code+'|'+pr.ch+'|'+vs[0],text:balanceQuotes(text)};
+  }
+};
 })();

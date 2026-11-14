@@ -79,4 +79,28 @@ function adminSection(){
 document.addEventListener('DOMContentLoaded',function(){
   new MutationObserver(adminSection).observe(document.body,{childList:true,subtree:true});
 });
+
+/* ---------- Toleo kwenye kijachini + shukrani ya Biblia ---------- */
+function verName(){
+  try{ if(window.MJUE_NATIVE && typeof window.MJUE_NATIVE.appVersionName==='function'){ var v=String(window.MJUE_NATIVE.appVersionName()||''); if(v) return v; } }catch(e){}
+  return '';
+}
+function footers(){
+  var v=verName();
+  var fn=document.querySelectorAll('.footer-note');
+  for(var i=0;i<fn.length;i++){
+    if(/^MJUE YESU\s*·\s*Toleo/.test(fn[i].textContent.trim())){
+      if(v) fn[i].textContent='MJUE YESU · Toleo '+v;
+      if(!document.getElementById('bibleCredit')){
+        var c=document.createElement('div'); c.id='bibleCredit'; c.className='footer-note';
+        c.style.cssText='font-size:11px;opacity:.75;margin-top:2px';
+        c.textContent='Biblia: Biblica® Toleo Wazi Neno (CC BY-SA 4.0) · ULB, Door43 (CC BY-SA 4.0)';
+        fn[i].insertAdjacentElement('afterend',c);
+      }
+      break;
+    }
+  }
+}
+document.addEventListener('DOMContentLoaded',function(){ setTimeout(footers,600); setTimeout(footers,2500); });
+document.addEventListener('mjue-synced',function(){ setTimeout(footers,300); });
 })();

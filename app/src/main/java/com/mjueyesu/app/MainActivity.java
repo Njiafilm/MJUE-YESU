@@ -348,6 +348,15 @@ public class MainActivity extends AppCompatActivity {
             } catch (Exception e) { return 0; }
         }
 
+        /** Jina la toleo (versionName) la app iliyosakinishwa. */
+        @JavascriptInterface
+        public String appVersionName() {
+            try {
+                String v = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
+                return v == null ? "" : v;
+            } catch (Exception e) { return ""; }
+        }
+
         /** Fungua kiungo cha http(s) kwenye kivinjari cha simu. */
         @JavascriptInterface
         public void openUrl(final String url) {

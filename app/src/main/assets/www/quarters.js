@@ -151,16 +151,75 @@ DATA[2]={key:'q1-27',title:'Unabii Mkuu wa Kiapokaliptiki',en:'Great Apocalyptic
     11:[['REV',14,1,'Ufunuo 14:1-12']]
   }};
 
+/* Mafungu ya "Somo la Juma Hili" (kusoma kwa juma) — Q1 2027. Yanageuzwa kuwa viungo vya Biblia kiotomatiki.
+   Chanzo: toleo la GC (2002) la "Great Apocalyptic Prophecies". THIBITISHA na kitabu rasmi cha 2027. */
+DATA[2].rt={
+ 1:'Danieli 2:28; Danieli 7:15–18; Mathayo 24:15, 16; Luka 24:27; 2 Wathesalonike 2:3–8',
+ 2:'Danieli 2; Danieli 7',
+ 3:'Mwanzo 3:8–19; Zaburi 95:5, 10; Danieli 7:10, 22; Yohana 5:24, 25; Warumi 14:10; 2 Wakorintho 5:10; Waebrania 9:24; Ufunuo 20:12, 13',
+ 4:'Danieli 8',
+ 5:'Ezra 7; Danieli 9; Waebrania 10:8–10',
+ 6:'Kutoka 25:8; Walawi 16; Danieli 7:9–11, 13, 14; Danieli 8:14; Danieli 9:24; Warumi 8:34; Waebrania 7:25',
+ 7:'Mathayo 24; Mathayo 25',
+ 8:'Ufunuo 12',
+ 9:'Ufunuo 13:1–10',
+ 10:'Ufunuo 13:11–18',
+ 11:'Ufunuo 14:1–12',
+ 12:'Isaya 35; Mathayo 24:30; Yohana 14:1–3; Matendo 1:10, 11; 1 Wakorintho 15:51–57; 1 Wathesalonike 4:15–17; Ufunuo 21:1–7',
+ 13:'Mwanzo 5:18–24; Isaya 53:5, 6; Matendo 2:38; 2 Wakorintho 5:18–21; 1 Yohana 1:9; 1 Yohana 2:1, 2'
+};
+
+/* ------------------------------------------------------------------
+   ROBO ZA CLOUD (admin): blob 'quarters' = {v:1,q:{"<kielezo cha robo>":{title,en,lessons:[{t,en,m,mt,r}]}}}
+     t=kichwa cha somo, en=kichwa cha Kiingereza, m=rejea ya fungu la kukariri, mt=maandishi (hiari; yakikosekana
+     yanatafutwa kwenye Biblia ya app), r=mafungu ya kusoma ya juma. Zinaongezwa/kubadilisha DATA bila kujenga APK upya.
+   ------------------------------------------------------------------ */
+var CLOUD={}, cloudSig=null, cloudChanged=false;
+function qKeyFor(k){var l=qLabel(qStart(k)).split(' '); return l[0].toLowerCase()+'-'+String(l[1]).slice(2);}
+function hasKeys(o){if(!o)return false; for(var x in o){if(o.hasOwnProperty(x)) return true;} return false;}
+function copyObj(o){var r={}; if(o){for(var x in o){if(o.hasOwnProperty(x)) r[x]=o[x];}} return r;}
+function bibleReady(){try{var a=window.MJUE_BIBLE_API; return !!(a&&a.ready&&a.ready());}catch(e){return false;}}
+function cloudLoad(){
+  var t=''; try{var m=window.MJUE_CLOUD; t=(m&&m.getBlobText&&m.getBlobText('quarters'))||'';}catch(e){}
+  var sig=t+'|'+(bibleReady()?1:0);
+  if(sig===cloudSig) return;
+  cloudSig=sig; cloudChanged=true; CLOUD={};
+  if(t){try{var o=JSON.parse(t), qs=(o&&o.q)||{}; for(var k in qs){if(qs.hasOwnProperty(k)&&+k>=2) CLOUD[+k]=qs[k];}}catch(e){}}
+}
+function resolveMem(ref,txt){
+  var a=window.MJUE_BIBLE_API, r=null;
+  try{r=a&&a.resolve?a.resolve(ref):null;}catch(e){}
+  if(r) return {ref:r.ref,pass:r.pass,text:txt||r.text};
+  return {ref:ref,pass:'',text:txt||''};
+}
+function dataOf(k){
+  cloudLoad();
+  var d=DATA[k], c=CLOUD[k];
+  if(d&&d.legacy) return d;
+  if(!c) return (d&&hasKeys(d.titles))?d:(d||null);
+  var o=copyObj(d); o.titles=copyObj(d&&d.titles); o.en_titles=copyObj(d&&d.en_titles); o.memory=copyObj(d&&d.memory); o.rt=copyObj(d&&d.rt);
+  o.key=(d&&d.key)||qKeyFor(k);
+  if(c.title) o.title=c.title; if(c.en) o.en=c.en;
+  var L=c.lessons||[];
+  for(var i=0;i<L.length&&i<13;i++){
+    var n=i+1,l=L[i]||{};
+    if(l.t) o.titles[n]=l.t; if(l.en) o.en_titles[n]=l.en; if(l.r) o.rt[n]=l.r;
+    if(l.m) o.memory[n]=resolveMem(l.m,l.mt);
+  }
+  if(!o.title) o.title='Robo mpya';
+  return o;
+}
+
 /* ------------------------------------------------------------------ */
 var legacyQ4=null;
 function setLegacyQ4(o){legacyQ4=o;}
 
 function quarter(k){
-  var d=DATA[k], start=qStart(k), has=!!d;
+  var d=dataOf(k), start=qStart(k), has=!!d&&(!!d.legacy||hasKeys(d.titles));
   var q={k:k,start:start,end:addDays(start,90),label:qLabel(start),span:qSpan(start),hasData:has,legacy:null,key:'qx'+k,
-         title:'',en:'',titles:{},memory:{},reads:{},en_titles:{}};
+         title:'',en:'',titles:{},memory:{},reads:{},en_titles:{},rt:{}};
   if(has){
-    q.legacy=d.legacy||null; q.key=d.key; q.title=d.title; q.en=d.en||''; q.reads=d.reads||{}; q.en_titles=d.en_titles||{};
+    q.legacy=d.legacy||null; q.key=d.key; q.title=d.title; q.en=d.en||''; q.reads=d.reads||{}; q.en_titles=d.en_titles||{}; q.rt=d.rt||{};
     q.titles=d.titles||{}; q.memory=d.memory||{};
     if(d.legacy==='q4' && legacyQ4){q.titles=legacyQ4.titles; q.memory=legacyQ4.memory;}
   }
@@ -170,7 +229,7 @@ function quarter(k){
 }
 function isPast(q){return q.end<today();}
 function curIndex(){var k=Math.floor(diffDays(today(),FIRST)/QDAYS); return k<0?0:k;}
-function maxDataIndex(){var m=0; for(var k in DATA){if(DATA.hasOwnProperty(k)&&+k>m)m=+k;} return m;}
+function maxDataIndex(){cloudLoad(); var m=0,k; for(k in DATA){if(DATA.hasOwnProperty(k)&&+k>m)m=+k;} for(k in CLOUD){if(CLOUD.hasOwnProperty(k)&&hasKeys((dataOf(+k)||{}).titles)&&+k>m)m=+k;} return m;}
 
 /* Robo ya sasa (kwa tarehe). Ikiwa robo ya tarehe hiyo bado haina data, inarudisha robo ya mwisho yenye data (stale=true). */
 function active(){
@@ -208,8 +267,8 @@ function isLegacy(key){var r=lookup(key); return !r || !!r.q.legacy;}
    ------------------------------------------------------------------ */
 function memBlock(m){
   if(!m) return '';
-  return '<div class="memory-verse lesson-memory"><div class="label">FUNGU LA KUKARIRI</div><p>“'+esc(m.text)+'”</p><div class="ref">'+esc(m.ref)+'</div>'+
-         '<div class="pass-row"><button type="button" class="pass-btn lesson-bible-btn" data-pass="'+esc(m.pass)+'">📖 '+esc(m.ref)+'</button></div></div>';
+  return '<div class="memory-verse lesson-memory"><div class="label">FUNGU LA KUKARIRI</div>'+(m.text?'<p>“'+esc(m.text)+'”</p>':'')+'<div class="ref">'+esc(m.ref)+'</div>'+
+         (m.pass?'<div class="pass-row"><button type="button" class="pass-btn lesson-bible-btn" data-pass="'+esc(m.pass)+'">📖 '+esc(m.ref)+'</button></div>':'')+'</div>';
 }
 function readBtns(q,n){
   var r=(q.reads&&q.reads[n])||[], h='';
@@ -238,7 +297,7 @@ function dayText(i,title,m){
 function template(q,n){
   var title=q.titles[n]||('Lesoni '+n), m=q.memory[n], dates=q.dates[n];
   var s=addDays(q.start,7*(n-1));
-  var rl=readLabels(q,n), rb=readBtns(q,n);
+  var rl=(q.rt&&q.rt[n])||readLabels(q,n), rb='';
   var h='<section class="lesson-cover">'+
     '<div class="lesson-day-banner"><span class="day-name">Somo la '+n+'</span><span class="day-meta">SABATO MCHANA<br>'+esc(dates)+'</span></div>'+
     '<h1 class="lesson-page-title" style="font-size:1.7rem">'+esc(title)+'</h1>'+
@@ -378,7 +437,7 @@ function renderMem(){
     var isC=(n===cur), past=(cur!=null&&n<cur)||(q.stale);
     h+='<div class="mem-card'+(isC?' cur':'')+(past?' past':'')+'"><div class="mem-top"><span class="mem-wk">JUMA '+n+' · '+esc(q.dates[n])+'</span>'+(isC?'<span class="mem-now">WIKI HII</span>':'')+'</div>'+
        '<div class="mem-title">'+esc(q.titles[n]||'')+'</div>'+
-       '<p class="mem-text">“'+esc(m.text)+'”</p>'+
+       (m.text?'<p class="mem-text">“'+esc(m.text)+'”</p>':'')+
        '<button type="button" class="mem-ref" data-mem-pass="'+esc(m.pass)+'">📖 '+esc(m.ref)+'</button></div>';
   }
   if(!any) h+='<div class="mem-empty">Mafungu ya kukariri ya robo hii bado hayajawekwa.</div>';
@@ -475,11 +534,13 @@ if(document.readyState==='loading') document.addEventListener('DOMContentLoaded'
 else setTimeout(boot,80);
 document.addEventListener('visibilitychange',function(){if(!document.hidden) tick();});
 setInterval(tick,60000);
+setInterval(function(){cloudLoad(); if(cloudChanged){cloudChanged=false; refreshAll();}},1500);
 
 window.MJUE_Q={
   FIRST:FIRST, quarter:quarter, active:active, list:list, key:function(n,q){return keyFor(q||active(),n);},
   lookup:lookup, isLegacy:isLegacy, template:template, setLegacyQ4:setLegacyQ4,
   start:function(){return active().start;}, label:function(){return active().label;}, homeHeading:homeHeading,
-  refresh:refreshAll, renderMem:renderMem, payload:weeklyPayload, DATA:DATA
+  refresh:refreshAll, renderMem:renderMem, payload:weeklyPayload, DATA:DATA,
+  qStart:qStart, qLabel:qLabel, maxIndex:maxDataIndex, curIndex:curIndex, dateRange:range, hasKeys:hasKeys, readLabels:readLabels, resolveMem:resolveMem
 };
 })();
