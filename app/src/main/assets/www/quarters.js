@@ -347,7 +347,7 @@ function template(q,n){
   var h='<div class="lesson-day-nav" id="lessonDayNav" data-q27="1">';
   for(var j=0;j<7;j++) h+='<button type="button" data-jump="'+WID[j]+'"'+(j===0?' class="active"':'')+'>'+WNAME[j]+'</button>';
   h+='</div>';
-  h+='<section class="lesson-cover" id="day-sabato"><div class="lesson-cover-badge">LESENI '+n+' · '+esc(q.label)+'</div>'+
+  h+='<section class="lesson-cover lc27" id="day-sabato"><div class="lesson-cover-badge">LESENI '+n+' · '+esc(q.label)+'</div>'+
      '<div class="lesson-cover-date">'+esc(dates)+'</div><h1>'+T+'</h1>'+
      '<p>'+(q.en_titles&&q.en_titles[n]?esc(q.en_titles[n])+' · ':'')+esc(q.title)+'</p></section>';
   h+='<article class="lesson-page lesson-sabbath"><div class="lesson-dayhead"><span class="lesson-day">'+WD[0]+'</span><span class="lesson-date">'+esc(shortDate(s))+'</span></div>'+
@@ -378,7 +378,7 @@ function template(q,n){
 (function css(){
   var st=document.createElement('style'); st.id='quarters-style';
   st.textContent=
-  '#lessonReaderBody .lesson-cover p{color:#f0d9c0!important}'+
+  '#lessonReaderBody .lesson-cover.lc27 p{color:#f0d9c0!important}'+
   '.quarter-btn .q-now{display:inline-block;margin-left:4px;padding:1px 6px;border-radius:999px;background:var(--gold,#d4a017);color:#2b1a05;font-size:9px;font-weight:900;letter-spacing:.4px;vertical-align:1px}'+
   '.quarter-btn.q-empty{opacity:.75;border-style:dashed}'+
   '.mem-section{margin:0 0 26px}'+
